@@ -20,6 +20,12 @@ This split exists because PopClip's JavaScript sandbox can't open a real,
 persistent window or make arbitrary network calls comfortably — so the
 extension delegates everything to the app.
 
+## Demo
+
+<p align="center">
+  <img src="assets/demo.gif" alt="Lumo translating an English sentence into Simplified Chinese, with the result streaming in" width="70%">
+</p>
+
 ## Features
 
 - **Three actions** on any selection: 翻译 (translate), 润色 (polish),
@@ -32,18 +38,6 @@ extension delegates everything to the app.
 - **Translation history** with a master-detail browser.
 - **Text-to-speech** for reading results aloud.
 - **Menu-bar only** (`LSUIElement`) — no Dock icon, stays out of the way.
-
-## How it works
-
-```
-   select text  ─▶  PopClip  ─▶  lumo://translate?mode=…&text=…  ─▶  Lumo.app
-                                  (long selections passed via clipboard)        │
-                                                                                ▼
-                                                            LLM provider (streamed) ─▶ result window
-```
-
-Long selections exceed the URL-scheme length limit, so the extension copies them
-to the clipboard and signals the app to read from there (`via=clipboard`).
 
 ## Repository layout
 
