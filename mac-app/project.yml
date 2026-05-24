@@ -1,0 +1,63 @@
+name: Lumo
+options:
+  bundleIdPrefix: com.iuhoay
+  createIntermediateGroups: true
+  deploymentTarget:
+    macOS: "14.0"
+
+settings:
+  base:
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    # Local, unsigned build for personal use.
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGNING_REQUIRED: "NO"
+    CODE_SIGNING_ALLOWED: "NO"
+    ENABLE_HARDENED_RUNTIME: "NO"
+
+targets:
+  Lumo:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: Lumo
+    settings:
+      # Release (base) = production entity; Debug overrides = dev entity.
+      # Distinct bundle id + URL scheme + name so both can coexist without
+      # LaunchServices routing the scheme to the wrong build.
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.iuhoay.lumo
+        PRODUCT_NAME: Lumo
+        APP_URL_SCHEME: lumo
+        APP_DISPLAY_NAME: Lumo
+        GENERATE_INFOPLIST_FILE: "NO"
+        COMBINE_HIDPI_IMAGES: "YES"
+        ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS: "NO"
+      configs:
+        Debug:
+          PRODUCT_BUNDLE_IDENTIFIER: com.iuhoay.lumo.dev
+          PRODUCT_NAME: "Lumo Dev"
+          APP_URL_SCHEME: lumo-dev
+          APP_DISPLAY_NAME: "Lumo Dev"
+    info:
+      path: Lumo/Info.plist
+      properties:
+        # Build settings below are substituted by Xcode at "Process Info.plist".
+        CFBundleDisplayName: $(APP_DISPLAY_NAME)
+        CFBundleName: $(PRODUCT_NAME)
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        LSMinimumSystemVersion: "14.0"
+        # Menu-bar accessory app: no Dock icon, no main window.
+        LSUIElement: true
+        # Register the custom URL scheme PopClip uses to hand off selected text.
+        CFBundleURLTypes:
+          - CFBundleURLName: $(PRODUCT_BUNDLE_IDENTIFIER)
+            CFBundleTypeRole: Viewer
+            CFBundleURLSchemes:
+              - $(APP_URL_SCHEME)
+        # Allow plain-HTTP endpoints too (e.g. local Ollama). DeepSeek/OpenAI are HTTPS.
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true

@@ -1,0 +1,16 @@
+{
+  "identifier": "com.iuhoay.lumo",
+  "name": "Lumo",
+  "description": "把选中文字交给 Lumo.app 处理（翻译 / 润色 / 总结）。Provider、API Key、模型、语言都在 app 的设置里配置。",
+  "icon": "symbol:character.bubble",
+  "module": "translate.js",
+  "options": [
+    {
+      "identifier": "scheme",
+      "label": "App URL Scheme",
+      "type": "string",
+      "defaultValue": "lumo",
+      "description": "Which Lumo build to launch: 'lumo' for the release app, 'lumo-dev' for the dev build."
+    }
+  ]
+}

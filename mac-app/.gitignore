@@ -1,0 +1,9 @@
+# Build output
+build/
+DerivedData/
+
+# xcodegen-generated project (regenerate with: xcodegen generate)
+*.xcodeproj/
+
+# macOS
+.DS_Store
