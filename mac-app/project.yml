@@ -7,7 +7,7 @@ options:
 
 settings:
   base:
-    MARKETING_VERSION: "0.1.0"
+    MARKETING_VERSION: "0.1.1"
     CURRENT_PROJECT_VERSION: "1"
     SWIFT_VERSION: "5.0"
     # Local, unsigned build for personal use.
@@ -48,7 +48,7 @@ targets:
         # Build settings below are substituted by Xcode at "Process Info.plist".
         CFBundleDisplayName: $(APP_DISPLAY_NAME)
         CFBundleName: $(PRODUCT_NAME)
-        CFBundleShortVersionString: "0.1.0"
+        CFBundleShortVersionString: "0.1.1"
         CFBundleVersion: "1"
         LSMinimumSystemVersion: "14.0"
         # Menu-bar accessory app: no Dock icon, no main window.
