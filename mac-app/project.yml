@@ -35,6 +35,7 @@ targets:
         GENERATE_INFOPLIST_FILE: "NO"
         COMBINE_HIDPI_IMAGES: "YES"
         ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS: "NO"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
       configs:
         Debug:
           PRODUCT_BUNDLE_IDENTIFIER: com.iuhoay.lumo.dev
