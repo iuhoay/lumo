@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and package
+        working-directory: mac-app
+        run: |
+          brew install xcodegen
+          xcodegen generate
+          xcodebuild -project Lumo.xcodeproj -target Lumo -configuration Release \
+            SYMROOT="$PWD/build" ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO build
+          codesign --force -s - build/Release/Lumo.app
+          ditto -c -k --keepParent build/Release/Lumo.app Lumo.zip
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" mac-app/Lumo.zip --generate-notes
