@@ -59,7 +59,21 @@ mac-app/               Native macOS app (Swift, SwiftUI + AppKit)
 
 ## Install
 
-### 1. Build the macOS app
+### 1. Install the macOS app
+
+Download [**Lumo.zip**](https://github.com/iuhoay/lumo/releases/latest/download/Lumo.zip),
+unzip it, and move `Lumo.app` to `/Applications`. The app is unsigned, so clear
+the quarantine flag once before the first launch:
+
+```sh
+xattr -dr com.apple.quarantine /Applications/Lumo.app
+```
+
+On first launch it runs as a menu-bar item — look for it in the status bar, not
+the Dock.
+
+<details>
+<summary>Or build it yourself from source</summary>
 
 The Xcode project is generated from `project.yml` (it is not committed). From
 `mac-app/`:
@@ -71,13 +85,13 @@ xcodegen generate            # creates Lumo.xcodeproj
 open Lumo.xcodeproj          # then build & run the "Lumo" scheme in Xcode
 ```
 
-The app builds unsigned for local/personal use. On first launch it runs as a
-menu-bar item (look for it in the status bar, not the Dock).
+</details>
 
 ### 2. Install the PopClip extension
 
-Double-click `Lumo.popclipext` to install it into PopClip, then enable it in
-PopClip's preferences.
+Get [`Lumo.popclipext`](https://github.com/iuhoay/lumo/tree/main/Lumo.popclipext)
+from this repo (clone or download the repo), then double-click it to install it
+into PopClip and enable it in PopClip's preferences.
 
 ## Configure
 
