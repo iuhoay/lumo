@@ -3,7 +3,7 @@ options:
   bundleIdPrefix: com.iuhoay
   createIntermediateGroups: true
   deploymentTarget:
-    macOS: "14.0"
+    macOS: "26.0"
 
 settings:
   base:
@@ -20,7 +20,7 @@ targets:
   Lumo:
     type: application
     platform: macOS
-    deploymentTarget: "14.0"
+    deploymentTarget: "26.0"
     sources:
       - path: Lumo
     settings:
@@ -50,7 +50,7 @@ targets:
         CFBundleName: $(PRODUCT_NAME)
         CFBundleShortVersionString: "0.1.1"
         CFBundleVersion: "1"
-        LSMinimumSystemVersion: "14.0"
+        LSMinimumSystemVersion: "26.0"
         # Menu-bar accessory app: no Dock icon, no main window.
         LSUIElement: true
         # Register the custom URL scheme PopClip uses to hand off selected text.

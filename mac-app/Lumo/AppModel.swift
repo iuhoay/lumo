@@ -25,6 +25,11 @@ final class AppModel: ObservableObject {
         windowController.setPinned(isPinned)
     }
 
+    /// Hide the floating translation window.
+    func dismiss() {
+        windowController.close()
+    }
+
     /// Entry point for a hand-off from PopClip.
     func handle(_ request: TranslationRequest) {
         self.request = request

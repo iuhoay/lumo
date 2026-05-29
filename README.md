@@ -52,9 +52,9 @@ mac-app/               Native macOS app (Swift, SwiftUI + AppKit)
 
 ## Requirements
 
-- macOS 14.0 or later
+- macOS 26.0 or later (the app adopts the Liquid Glass design)
 - [PopClip](https://pilotmoon.com/popclip/)
-- [XcodeGen](https://github.com/yonaskolb/XcodeGen) and Xcode (to build the app)
+- [XcodeGen](https://github.com/yonaskolb/XcodeGen) and Xcode 26 or later (to build the app)
 - An API key for your chosen LLM provider
 
 ## Install

@@ -41,7 +41,10 @@ struct TranslationView: View {
             }
         }
         .padding(16)
-        .frame(minWidth: 360, minHeight: 240)
+        .frame(minWidth: 360, maxWidth: .infinity, minHeight: 240, maxHeight: .infinity, alignment: .topLeading)
+        // Liquid Glass: the whole popup is a single floating glass slab over the
+        // desktop. Controls inside stay flat (borderless) to avoid glass-on-glass.
+        .glassEffect(in: RoundedRectangle(cornerRadius: GlassPanelMetrics.cornerRadius, style: .continuous))
     }
 
     private func header(for request: TranslationRequest) -> some View {
@@ -81,7 +84,13 @@ struct TranslationView: View {
             }
             .help("复制译文")
             .disabled(model.output.isEmpty)
+
+            Button { model.dismiss() } label: {
+                Image(systemName: "xmark")
+            }
+            .help("关闭（Esc）")
         }
+        .buttonStyle(.borderless)
     }
 
     @ViewBuilder
