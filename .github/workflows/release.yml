@@ -26,4 +26,24 @@ jobs:
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" mac-app/Lumo.zip --generate-notes
+        run: |
+          # Install instructions sit beside the asset; --generate-notes appends
+          # the auto changelog after this body (GitHub API: generated notes are
+          # appended when a body is also provided).
+          cat > notes.md <<'EOF'
+          ## Install
+
+          1. Download `Lumo.zip` below and unzip it.
+          2. Move `Lumo.app` to `/Applications`.
+          3. The app is unsigned, so clear the quarantine flag once before the first launch:
+
+             ```sh
+             xattr -dr com.apple.quarantine /Applications/Lumo.app
+             ```
+
+          4. Lumo runs as a menu-bar item (no Dock icon) — look for it in the status bar.
+
+          ---
+          EOF
+          gh release create "$GITHUB_REF_NAME" mac-app/Lumo.zip \
+            --notes-file notes.md --generate-notes

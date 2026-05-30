@@ -9,10 +9,18 @@ final class AppSettings: ObservableObject {
     private let defaults = UserDefaults.standard
 
     @Published var provider: Provider {
-        didSet { defaults.set(provider.rawValue, forKey: Keys.provider) }
+        didSet {
+            defaults.set(provider.rawValue, forKey: Keys.provider)
+            // Swap to the newly-selected provider's OWN base URL so the API key
+            // (also per-provider) is never paired with a different provider's
+            // host — that would POST one vendor's secret key to another's server.
+            baseURL = resolvedBaseURL(for: provider)
+        }
     }
+    /// Base URL for the CURRENT provider. Backed per-provider (like the API key)
+    /// so switching the provider picker swaps the host in lockstep with the key.
     @Published var baseURL: String {
-        didSet { defaults.set(baseURL, forKey: Keys.baseURL) }
+        didSet { defaults.set(baseURL, forKey: baseURLKey(for: provider)) }
     }
     @Published var model: String {
         didSet { defaults.set(model, forKey: Keys.model) }
@@ -27,11 +35,37 @@ final class AppSettings: ObservableObject {
     }
 
     private init() {
-        provider = Provider(rawValue: defaults.string(forKey: Keys.provider) ?? "") ?? .openAICompatible
-        baseURL = defaults.string(forKey: Keys.baseURL) ?? "https://api.deepseek.com"
+        let provider = Provider(rawValue: defaults.string(forKey: Keys.provider) ?? "") ?? .openAICompatible
+        self.provider = provider
         model = defaults.string(forKey: Keys.model) ?? "deepseek-v4-flash"
         targetWhenChinese = defaults.string(forKey: Keys.targetWhenChinese) ?? "English"
         targetWhenOther = defaults.string(forKey: Keys.targetWhenOther) ?? "Simplified Chinese"
+        // Resolve the current provider's base URL, migrating any pre-existing
+        // single global value (legacy Keys.baseURL) into the current provider.
+        let perProvider = defaults.string(forKey: "baseURL.\(provider.rawValue)") ?? ""
+        let legacy = defaults.string(forKey: Keys.baseURL) ?? ""
+        baseURL = !perProvider.isEmpty ? perProvider
+            : (!legacy.isEmpty ? legacy : provider.defaultBaseURL)
+        // didSet does NOT fire for assignments inside init, and resolvedBaseURL(for:)
+        // reads the persisted slot — so a migrated legacy global would otherwise be
+        // shown in Settings yet never actually used (requests would silently hit the
+        // vendor default host). Persist the migrated value into the per-provider slot
+        // here, then retire the legacy key. Fresh users keep an empty slot so
+        // resolvedBaseURL stays on the live provider default.
+        if perProvider.isEmpty && !legacy.isEmpty {
+            defaults.set(baseURL, forKey: "baseURL.\(provider.rawValue)")
+            defaults.removeObject(forKey: Keys.baseURL)
+        }
+    }
+
+    // MARK: - Per-provider base URL
+
+    private func baseURLKey(for provider: Provider) -> String { "baseURL.\(provider.rawValue)" }
+
+    /// The stored base URL for a given provider, falling back to its default.
+    func resolvedBaseURL(for provider: Provider) -> String {
+        let stored = defaults.string(forKey: baseURLKey(for: provider)) ?? ""
+        return stored.isEmpty ? provider.defaultBaseURL : stored
     }
 
     // MARK: - API keys (per provider)

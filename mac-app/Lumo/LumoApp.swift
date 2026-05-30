@@ -10,10 +10,8 @@ struct LumoApp: App {
             MenuBarContent()
                 .environmentObject(model)
         }
-
-        Settings {
-            SettingsView()
-                .environmentObject(model)
-        }
+        // Settings is an AppKit-managed window (SettingsWindowController), not a
+        // SwiftUI `Settings` scene: in this LSUIElement app the scene's
+        // \.openSettings action does not open from the detached panel.
     }
 }

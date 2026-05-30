@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 /// The contents of the floating translation window.
 struct TranslationView: View {
@@ -97,10 +98,18 @@ struct TranslationView: View {
     private var resultArea: some View {
         ScrollView {
             if let errorText = model.errorText {
-                Text(errorText)
-                    .foregroundStyle(.red)
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(errorText)
+                        .foregroundStyle(.red)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    // The error (e.g. "未设置 API Key") names Settings; give the
+                    // user a way to reach it from the floating panel itself.
+                    Button("打开设置") {
+                        SettingsWindowController.shared.present()
+                    }
+                    .controlSize(.small)
+                }
             } else if model.output.isEmpty && model.isLoading {
                 Text("翻译中…")
                     .foregroundStyle(.secondary)

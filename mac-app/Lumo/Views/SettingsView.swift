@@ -14,11 +14,9 @@ struct SettingsView: View {
                     }
                 }
                 .onChange(of: settings.provider) { _, newValue in
-                    // Reflect the new provider's stored key + sensible default base URL.
+                    // AppSettings already swapped baseURL to the new provider's
+                    // own stored value; just refresh the local API-key field.
                     apiKey = settings.apiKey(for: newValue)
-                    if settings.baseURL.isEmpty {
-                        settings.baseURL = newValue.defaultBaseURL
-                    }
                 }
 
                 SecureField("API Key", text: $apiKey)

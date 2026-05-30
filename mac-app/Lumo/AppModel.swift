@@ -53,7 +53,7 @@ final class AppModel: ObservableObject {
         )
         resolvedTarget = target
         let chat = ChatRequest(
-            baseURL: settings.baseURL,
+            baseURL: settings.resolvedBaseURL(for: settings.provider),
             apiKey: settings.apiKey(for: settings.provider),
             model: settings.model,
             system: request.mode.systemPrompt(target: target),

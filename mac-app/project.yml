@@ -50,6 +50,7 @@ targets:
         CFBundleName: $(PRODUCT_NAME)
         CFBundleShortVersionString: "0.1.1"
         CFBundleVersion: "1"
+        NSHumanReadableCopyright: "Copyright © 2026 iuhoay. All rights reserved."
         LSMinimumSystemVersion: "26.0"
         # Menu-bar accessory app: no Dock icon, no main window.
         LSUIElement: true
