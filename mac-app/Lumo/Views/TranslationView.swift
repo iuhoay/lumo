@@ -101,32 +101,30 @@ struct TranslationView: View {
         .buttonStyle(IconButtonStyle())
     }
 
-    /// Editable "Original" field. A flat inset box (stroke + subtle fill) keeps it
-    /// readable over the refracting glass without nesting glass-on-glass.
+    /// Editable "Original" field — bare text on the glass (no fill or border), so
+    /// it reads as one slab with the result area below rather than a box sitting
+    /// on top. TextEditor carries a small built-in text inset; the negative
+    /// leading padding pulls it back in line with the surrounding content, and
+    /// the placeholder mirrors that inset so it sits exactly where typing begins.
     private var inputField: some View {
         TextEditor(text: $model.inputText)
             .font(.body)
             .scrollContentBackground(.hidden)
-            .padding(6)
             .frame(height: 64)
-            .background(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(.quaternary)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .stroke(.secondary.opacity(0.25), lineWidth: 1)
-            )
             .overlay(alignment: .topLeading) {
                 if model.inputText.isEmpty {
                     Text("Type or paste text here…")
+                        .font(.body)
                         .foregroundStyle(.secondary)
-                        .padding(.leading, 11)
-                        .padding(.top, 14)
+                        // Match TextEditor's text origin: ~5pt leading inset and
+                        // a near-zero top inset, so the placeholder sits exactly
+                        // where the caret/first line begins (no top padding).
+                        .padding(.leading, 5)
                         .allowsHitTesting(false)
                 }
             }
             .focused($inputFocused)
+            .padding(.leading, -5)
     }
 
     private var resultArea: some View {
