@@ -6,7 +6,7 @@ import SwiftUI
 /// scene because this is an LSUIElement app — the `Settings` scene and its
 /// `\.openSettings` action do NOT reliably open from the detached
 /// `NSHostingController` that hosts the floating translation panel (the panel's
-/// "打开设置" button was a silent no-op). An AppKit-managed window opens on
+/// "Open Settings" button was a silent no-op). An AppKit-managed window opens on
 /// demand from both the menu bar and the translation panel. Mirrors
 /// `HistoryWindowController`.
 @MainActor
@@ -28,7 +28,7 @@ final class SettingsWindowController {
 
         let hosting = NSHostingController(rootView: SettingsView())
         let window = NSWindow(contentViewController: hosting)
-        window.title = "设置"
+        window.title = String(localized: "Settings")
         window.styleMask = [.titled, .closable]
         window.isReleasedWhenClosed = false
         window.center()

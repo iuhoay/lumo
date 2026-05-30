@@ -19,16 +19,16 @@ enum TranslationError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .missingAPIKey:
-            return "未设置 API Key，请在设置里填写。"
+            return String(localized: "No API key set. Add one in Settings.")
         case .invalidBaseURL:
-            return "Base URL 无效，请检查设置。"
+            return String(localized: "Invalid Base URL. Check Settings.")
         case .http(let status, let body):
             let detail = Self.friendlyBody(body)
-            return "请求失败 (HTTP \(status))：\(detail)"
+            return "\(String(localized: "Request failed")) (HTTP \(status)): \(detail)"
         case .invalidResponse:
-            return "无法解析模型返回。"
+            return String(localized: "Couldn't parse the model response.")
         case .network(let message):
-            return "网络错误：\(message)"
+            return "\(String(localized: "Network error")): \(message)"
         }
     }
 
@@ -37,7 +37,7 @@ enum TranslationError: LocalizedError {
         guard let data = body.data(using: .utf8),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let error = json["error"] as? [String: Any] else {
-            return body.isEmpty ? "(无响应内容)" : body
+            return body.isEmpty ? String(localized: "(no response body)") : body
         }
         return (error["message"] as? String) ?? (error["type"] as? String) ?? body
     }

@@ -2,7 +2,7 @@ import Combine
 import Sparkle
 
 /// Owns the Sparkle updater for the whole app lifetime. A singleton (like the
-/// app's other shared services) so the menu-bar "检查更新…" button can reach it
+/// app's other shared services) so the menu-bar "Check for Updates…" button can reach it
 /// without threading a reference through the SwiftUI `MenuBarExtra` content.
 ///
 /// Created once from `AppDelegate` at launch so scheduled background checks start

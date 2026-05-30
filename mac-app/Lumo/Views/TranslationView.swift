@@ -11,7 +11,7 @@ struct TranslationView: View {
                 header(for: request)
 
                 HStack {
-                    sectionLabel("原文")
+                    sectionLabel("Original")
                     speakButton(request.text)
                     Spacer()
                 }
@@ -25,7 +25,7 @@ struct TranslationView: View {
                 Divider()
 
                 HStack {
-                    sectionLabel(request.mode == .summarize ? "总结" : (request.mode == .polish ? "润色" : "译文"))
+                    sectionLabel(request.mode == .summarize ? "Summary" : (request.mode == .polish ? "Polished" : "Translation"))
                     if !model.resolvedTarget.isEmpty, request.mode != .polish {
                         Text("· \(model.resolvedTarget)")
                             .font(.caption)
@@ -38,7 +38,7 @@ struct TranslationView: View {
 
                 resultArea
             } else {
-                Text("等待输入…").foregroundStyle(.secondary)
+                Text("Waiting for input…").foregroundStyle(.secondary)
             }
         }
         .padding(16)
@@ -67,29 +67,29 @@ struct TranslationView: View {
             Button { HistoryWindowController.shared.toggle() } label: {
                 Image(systemName: "clock.arrow.circlepath")
             }
-            .help("翻译历史")
+            .help("Translation History")
 
             Button { model.togglePin() } label: {
                 Image(systemName: model.isPinned ? "pin.fill" : "pin")
             }
-            .help("置顶窗口")
+            .help("Pin window")
 
             Button { model.retranslate() } label: {
                 Image(systemName: "arrow.clockwise")
             }
-            .help("重新翻译")
+            .help("Retranslate")
             .disabled(model.isLoading)
 
             Button { copyOutput() } label: {
                 Image(systemName: "doc.on.doc")
             }
-            .help("复制译文")
+            .help("Copy result")
             .disabled(model.output.isEmpty)
 
             Button { model.dismiss() } label: {
                 Image(systemName: "xmark")
             }
-            .help("关闭（Esc）")
+            .help("Close (Esc)")
         }
         .buttonStyle(.borderless)
     }
@@ -103,15 +103,15 @@ struct TranslationView: View {
                         .foregroundStyle(.red)
                         .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    // The error (e.g. "未设置 API Key") names Settings; give the
+                    // The error (e.g. "No API key set") names Settings; give the
                     // user a way to reach it from the floating panel itself.
-                    Button("打开设置") {
+                    Button("Open Settings") {
                         SettingsWindowController.shared.present()
                     }
                     .controlSize(.small)
                 }
             } else if model.output.isEmpty && model.isLoading {
-                Text("翻译中…")
+                Text("Translating…")
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
             } else {
@@ -128,11 +128,11 @@ struct TranslationView: View {
         }
         .buttonStyle(.borderless)
         .controlSize(.small)
-        .help("朗读")
+        .help("Read aloud")
         .disabled(disabled)
     }
 
-    private func sectionLabel(_ text: String) -> some View {
+    private func sectionLabel(_ text: LocalizedStringKey) -> some View {
         Text(text)
             .font(.caption)
             .foregroundStyle(.secondary)

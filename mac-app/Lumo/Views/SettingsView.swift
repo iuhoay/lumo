@@ -30,9 +30,9 @@ struct SettingsView: View {
                           prompt: Text("deepseek-v4-flash"))
             }
 
-            Section("语言（翻译模式）") {
-                TextField("输入是中文 → 译成", text: $settings.targetWhenChinese)
-                TextField("输入非中文 → 译成", text: $settings.targetWhenOther)
+            Section("Language (translate mode)") {
+                TextField("Chinese input → translate to", text: $settings.targetWhenChinese)
+                TextField("Non-Chinese input → translate to", text: $settings.targetWhenOther)
             }
         }
         .formStyle(.grouped)

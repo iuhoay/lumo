@@ -37,7 +37,7 @@ final class HistoryWindowController {
             .modelContainer(HistoryStore.shared.container)
         let hosting = NSHostingController(rootView: root)
         let window = NSWindow(contentViewController: hosting)
-        window.title = "翻译历史"
+        window.title = String(localized: "Translation History")
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         window.setContentSize(NSSize(width: 820, height: 560))
         window.minSize = NSSize(width: 720, height: 460)

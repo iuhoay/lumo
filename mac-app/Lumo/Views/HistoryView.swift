@@ -27,17 +27,17 @@ struct HistoryView: View {
             if let selected {
                 detail(selected)
             } else {
-                ContentUnavailableView("选择一条记录", systemImage: "sidebar.left")
+                ContentUnavailableView("Select a record", systemImage: "sidebar.left")
             }
         }
-        .navigationTitle("翻译历史")
+        .navigationTitle("Translation History")
         .frame(minWidth: 720, minHeight: 460)
     }
 
     private var sidebar: some View {
         Group {
             if filtered.isEmpty {
-                ContentUnavailableView("暂无历史", systemImage: "clock")
+                ContentUnavailableView("No history yet", systemImage: "clock")
             } else {
                 List(selection: $selectedID) {
                     ForEach(filtered) { item in
@@ -46,7 +46,7 @@ struct HistoryView: View {
                 }
             }
         }
-        .searchable(text: $search, prompt: "搜索原文或译文")
+        .searchable(text: $search, prompt: "Search source or result")
     }
 
     private func sidebarRow(_ item: HistoryItem) -> some View {
@@ -66,7 +66,7 @@ struct HistoryView: View {
         }
         .padding(.vertical, 2)
         .contextMenu {
-            Button("删除", role: .destructive) {
+            Button("Delete", role: .destructive) {
                 if selectedID == item.id { selectedID = nil }
                 HistoryStore.shared.delete(item)
             }
@@ -87,8 +87,8 @@ struct HistoryView: View {
 
                 actions(item)
 
-                field("原文", item.sourceText)
-                field("译文", item.outputText)
+                field("Original", item.sourceText)
+                field("Translation", item.outputText)
 
                 metadata(item)
             }
@@ -103,24 +103,24 @@ struct HistoryView: View {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(item.outputText, forType: .string)
             } label: {
-                Label("复制译文", systemImage: "doc.on.doc")
+                Label("Copy result", systemImage: "doc.on.doc")
             }
             Button {
                 AppModel.shared.handle(TranslationRequest(text: item.sourceText, mode: item.mode))
             } label: {
-                Label("重新翻译", systemImage: "arrow.clockwise")
+                Label("Retranslate", systemImage: "arrow.clockwise")
             }
             Spacer()
             Button(role: .destructive) {
                 selectedID = nil
                 HistoryStore.shared.delete(item)
             } label: {
-                Label("删除", systemImage: "trash")
+                Label("Delete", systemImage: "trash")
             }
         }
     }
 
-    private func field(_ title: String, _ text: String) -> some View {
+    private func field(_ title: LocalizedStringKey, _ text: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.caption)
@@ -135,15 +135,15 @@ struct HistoryView: View {
 
     private func metadata(_ item: HistoryItem) -> some View {
         HStack(spacing: 16) {
-            meta("服务", item.provider.title)
-            meta("模型", item.model)
-            meta("目标语言", item.target)
+            meta("Provider", item.provider.title)
+            meta("Model", item.model)
+            meta("Target language", item.target)
         }
         .font(.caption2)
         .foregroundStyle(.secondary)
     }
 
-    private func meta(_ label: String, _ value: String) -> some View {
+    private func meta(_ label: LocalizedStringKey, _ value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
             Text(value)

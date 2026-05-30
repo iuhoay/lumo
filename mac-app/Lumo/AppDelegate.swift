@@ -5,7 +5,7 @@ import AppKit
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Touch the singleton so Sparkle starts its scheduled background update
-        // checks now, not only when the user opens the "检查更新…" menu item.
+        // checks now, not only when the user opens the "Check for Updates…" menu item.
         _ = UpdaterController.shared
     }
 

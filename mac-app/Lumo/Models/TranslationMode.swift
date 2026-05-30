@@ -10,9 +10,9 @@ enum TranslationMode: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .translate: return "翻译"
-        case .polish: return "润色"
-        case .summarize: return "总结"
+        case .translate: return String(localized: "Translate")
+        case .polish: return String(localized: "Polish")
+        case .summarize: return String(localized: "Summarize")
         }
     }
 
