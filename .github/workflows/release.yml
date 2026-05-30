@@ -62,6 +62,18 @@ jobs:
           PUBDATE=$(LC_ALL=C date -u "+%a, %d %b %Y %H:%M:%S +0000")
           DOWNLOAD_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/Lumo.zip"
           NOTES_URL="https://github.com/${GITHUB_REPOSITORY}/releases/tag/${GITHUB_REF_NAME}"
+          # Pull this version's CHANGELOG section as HTML so Sparkle shows real
+          # "what's new" notes in the in-app updater. <description> takes
+          # precedence over <releaseNotesLink>; an unknown version yields an
+          # empty block and Sparkle falls back to the link below.
+          NOTES_HTML=$(python3 "$GITHUB_WORKSPACE/scripts/release_notes.py" html "$GITHUB_REF_NAME")
+          if [ -n "$NOTES_HTML" ]; then
+            DESCRIPTION_BLOCK="<description><![CDATA[
+          ${NOTES_HTML}
+          ]]></description>"
+          else
+            DESCRIPTION_BLOCK=""
+          fi
           cat > appcast.xml <<EOF
           <?xml version="1.0" encoding="utf-8"?>
           <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
@@ -73,6 +85,7 @@ jobs:
           <sparkle:version>${BUILD_VERSION}</sparkle:version>
           <sparkle:shortVersionString>${SHORT_VERSION}</sparkle:shortVersionString>
           <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+          ${DESCRIPTION_BLOCK}
           <sparkle:releaseNotesLink>${NOTES_URL}</sparkle:releaseNotesLink>
           <enclosure url="${DOWNLOAD_URL}" type="application/octet-stream" ${SIG_ATTRS} />
           </item>
@@ -85,10 +98,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Install instructions sit beside the asset; --generate-notes appends
-          # the auto changelog after this body (GitHub API: generated notes are
-          # appended when a body is also provided).
-          cat > notes.md <<'EOF'
+          # Body = this version's CHANGELOG section (if any) + install steps;
+          # --generate-notes then appends the auto commit changelog after it
+          # (GitHub API: generated notes are appended when a body is provided).
+          {
+            VERSION_MD=$(python3 "$GITHUB_WORKSPACE/scripts/release_notes.py" md "$GITHUB_REF_NAME")
+            if [ -n "$VERSION_MD" ]; then
+              printf '## What'\''s New\n\n%s\n\n---\n\n' "$VERSION_MD"
+            fi
+            cat <<'EOF'
           ## Install
 
           1. Download `Lumo.zip` below and unzip it.
@@ -107,5 +125,6 @@ jobs:
 
           ---
           EOF
+          } > notes.md
           gh release create "$GITHUB_REF_NAME" mac-app/Lumo.zip mac-app/appcast.xml \
             --notes-file notes.md --generate-notes
