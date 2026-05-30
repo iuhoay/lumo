@@ -38,6 +38,9 @@ extension delegates everything to the app.
 - **Translation history** with a master-detail browser.
 - **Text-to-speech** for reading results aloud.
 - **Menu-bar only** (`LSUIElement`) — no Dock icon, stays out of the way.
+- **Automatic updates** via [Sparkle](https://sparkle-project.org) — Lumo checks
+  in the background (and on demand from the menu bar) and installs new versions in
+  place, so the one-time quarantine clear below never has to be repeated.
 
 ## Repository layout
 
@@ -71,6 +74,11 @@ xattr -dr com.apple.quarantine /Applications/Lumo.app
 
 On first launch it runs as a menu-bar item — look for it in the status bar, not
 the Dock.
+
+From then on Lumo keeps itself up to date: it checks in the background, and you
+can trigger a check yourself from the menu bar via **检查更新…**. Updates are
+verified by signature and installed in place without re-triggering quarantine —
+so you only ever run the `xattr` command this one time.
 
 <details>
 <summary>Or build it yourself from source</summary>
