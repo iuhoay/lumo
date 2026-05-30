@@ -32,7 +32,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>26.0</string>
 	<key>LSUIElement</key>
@@ -44,5 +44,11 @@
 	</dict>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2026 iuhoay. All rights reserved.</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://github.com/iuhoay/lumo/releases/latest/download/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>8IOxh9WdmEteI3C2lgiTGpoC6yVo26CWF8pNgn5kaQg=</string>
 </dict>
 </plist>

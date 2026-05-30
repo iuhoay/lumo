@@ -3,6 +3,8 @@ import AppKit
 
 /// Menu shown when clicking the menu-bar icon.
 struct MenuBarContent: View {
+    @ObservedObject private var updater = UpdaterController.shared
+
     var body: some View {
         Button("关于 Lumo") {
             // LSUIElement apps have no standard app menu, so the system "About"
@@ -16,6 +18,10 @@ struct MenuBarContent: View {
                 NSWorkspace.shared.open(url)
             }
         }
+        Button("检查更新…") {
+            updater.checkForUpdates()
+        }
+        .disabled(!updater.canCheckForUpdates)
         Divider()
         Button("翻译历史…") {
             HistoryWindowController.shared.present()

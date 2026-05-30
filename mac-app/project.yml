@@ -5,15 +5,26 @@ options:
   deploymentTarget:
     macOS: "26.0"
 
+packages:
+  # In-app auto-updater. Verifies updates with EdDSA (ed25519) signatures, so it
+  # needs no Apple Developer ID / notarization — only the SUPublicEDKey below and
+  # the matching private key (kept in the signer's Keychain / a CI secret).
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: "2.9.2"
+
 settings:
   base:
     MARKETING_VERSION: "0.1.2"
     CURRENT_PROJECT_VERSION: "1"
     SWIFT_VERSION: "5.0"
-    # Local, unsigned build for personal use.
+    # Ad-hoc signed (identity "-"), no Developer ID / notarization. Signing is
+    # ALLOWED (not NO) so Xcode signs the embedded Sparkle.framework + its nested
+    # XPC services inside-out during the build — Sparkle's helpers refuse to run
+    # from an unsigned bundle, and `codesign --deep` after the fact mis-signs them.
     CODE_SIGN_IDENTITY: "-"
     CODE_SIGNING_REQUIRED: "NO"
-    CODE_SIGNING_ALLOWED: "NO"
+    CODE_SIGNING_ALLOWED: "YES"
     ENABLE_HARDENED_RUNTIME: "NO"
 
 targets:
@@ -23,6 +34,8 @@ targets:
     deploymentTarget: "26.0"
     sources:
       - path: Lumo
+    dependencies:
+      - package: Sparkle
     settings:
       # Release (base) = production entity; Debug overrides = dev entity.
       # Distinct bundle id + URL scheme + name so both can coexist without
@@ -49,7 +62,15 @@ targets:
         CFBundleDisplayName: $(APP_DISPLAY_NAME)
         CFBundleName: $(PRODUCT_NAME)
         CFBundleShortVersionString: "0.1.2"
-        CFBundleVersion: "1"
+        # Build number Sparkle compares to decide "is there something newer". It
+        # was hardcoded "1", which would freeze update detection — every release
+        # looked like the same build. Now driven by CURRENT_PROJECT_VERSION, which
+        # CI sets to the monotonic git commit count.
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        # Sparkle auto-update wiring.
+        SUFeedURL: https://github.com/iuhoay/lumo/releases/latest/download/appcast.xml
+        SUPublicEDKey: 8IOxh9WdmEteI3C2lgiTGpoC6yVo26CWF8pNgn5kaQg=
+        SUEnableAutomaticChecks: true
         NSHumanReadableCopyright: "Copyright © 2026 iuhoay. All rights reserved."
         LSMinimumSystemVersion: "26.0"
         # Menu-bar accessory app: no Dock icon, no main window.
