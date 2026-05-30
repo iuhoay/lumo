@@ -7,7 +7,7 @@ options:
 
 settings:
   base:
-    MARKETING_VERSION: "0.1.1"
+    MARKETING_VERSION: "0.1.2"
     CURRENT_PROJECT_VERSION: "1"
     SWIFT_VERSION: "5.0"
     # Local, unsigned build for personal use.
@@ -48,7 +48,7 @@ targets:
         # Build settings below are substituted by Xcode at "Process Info.plist".
         CFBundleDisplayName: $(APP_DISPLAY_NAME)
         CFBundleName: $(PRODUCT_NAME)
-        CFBundleShortVersionString: "0.1.1"
+        CFBundleShortVersionString: "0.1.2"
         CFBundleVersion: "1"
         NSHumanReadableCopyright: "Copyright © 2026 iuhoay. All rights reserved."
         LSMinimumSystemVersion: "26.0"
