@@ -42,7 +42,11 @@ struct TranslationView: View {
             }
         }
         .padding(16)
-        .frame(minWidth: 360, maxWidth: .infinity, minHeight: 240, maxHeight: .infinity, alignment: .topLeading)
+        // minWidth must fit the header toolbar (fixed-size segmented picker +
+        // 5 icon buttons, ~416pt). NSHostingController sizes the window to this
+        // minWidth, so anything narrower clips the trailing buttons (retranslate,
+        // copy, close) past the rounded-glass mask, making them unclickable.
+        .frame(minWidth: 440, maxWidth: .infinity, minHeight: 240, maxHeight: .infinity, alignment: .topLeading)
         // Liquid Glass: the whole popup is a single floating glass slab over the
         // desktop. Controls inside stay flat (borderless) to avoid glass-on-glass.
         .glassEffect(in: RoundedRectangle(cornerRadius: GlassPanelMetrics.cornerRadius, style: .continuous))

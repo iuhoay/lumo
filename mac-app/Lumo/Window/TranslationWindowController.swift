@@ -76,7 +76,9 @@ final class TranslationWindowController {
         window.hasShadow = true
         window.isMovableByWindowBackground = true
         window.isReleasedWhenClosed = false
-        window.minSize = NSSize(width: 360, height: 240)
+        // Keep in sync with TranslationView's frame minWidth: a narrower window
+        // clips the header toolbar's trailing buttons under the rounded mask.
+        window.minSize = NSSize(width: 440, height: 240)
 
         // Clip the content view's layer to the same rounded rect as the glass.
         // Without this, the hosting view fills the square window bounds and a
