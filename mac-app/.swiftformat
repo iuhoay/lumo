@@ -1,0 +1,7 @@
+# SwiftFormat config for the Lumo app. Defaults are sensible; these just pin the
+# few choices worth being explicit about.
+--swiftversion 5.0
+--indent 4
+--self remove
+--importgrouping testable-bottom
+--commas inline
