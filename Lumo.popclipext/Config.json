@@ -1,16 +1,25 @@
 {
   "identifier": "com.iuhoay.lumo",
   "name": "Lumo",
-  "description": "把选中文字交给 Lumo.app 处理（翻译 / 润色 / 总结）。Provider、API Key、模型、语言都在 app 的设置里配置。",
+  "description": {
+    "en": "Hand selected text to Lumo.app to translate, polish, or summarize. Provider, API key, model, and language are all configured in the app's settings.",
+    "zh-Hans": "把选中文字交给 Lumo.app 处理（翻译 / 润色 / 总结）。Provider、API Key、模型、语言都在 app 的设置里配置。"
+  },
   "icon": "symbol:character.bubble",
   "module": "translate.js",
   "options": [
     {
       "identifier": "scheme",
-      "label": "App URL Scheme",
+      "label": {
+        "en": "App URL Scheme",
+        "zh-Hans": "应用 URL Scheme"
+      },
       "type": "string",
       "defaultValue": "lumo",
-      "description": "Which Lumo build to launch: 'lumo' for the release app, 'lumo-dev' for the dev build."
+      "description": {
+        "en": "Which Lumo build to launch: 'lumo' for the release app, 'lumo-dev' for the dev build.",
+        "zh-Hans": "启动哪个 Lumo 版本：'lumo' 为正式版，'lumo-dev' 为开发版。"
+      }
     }
   ]
 }

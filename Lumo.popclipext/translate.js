@@ -23,8 +23,12 @@ function trigger(mode, input) {
   }
 }
 
+// Action titles are localized via PopClip's "String (Localizable)" mechanism:
+// a { lang: string } dictionary with "en" as the required fallback. PopClip shows
+// the entry matching the user's language (zh-Hans for Simplified Chinese) and
+// falls back to English. Mirrors the app UI (Lumo/Localizable.xcstrings).
 exports.actions = [
-  { title: "翻译", icon: "symbol:character.bubble", code: (input) => trigger("translate", input) },
-  { title: "润色", icon: "symbol:wand.and.stars", code: (input) => trigger("polish", input) },
-  { title: "总结", icon: "symbol:text.append", code: (input) => trigger("summarize", input) },
+  { title: { en: "Translate", "zh-Hans": "翻译" }, icon: "symbol:character.bubble", code: (input) => trigger("translate", input) },
+  { title: { en: "Polish", "zh-Hans": "润色" }, icon: "symbol:wand.and.stars", code: (input) => trigger("polish", input) },
+  { title: { en: "Summarize", "zh-Hans": "总结" }, icon: "symbol:text.append", code: (input) => trigger("summarize", input) },
 ];
