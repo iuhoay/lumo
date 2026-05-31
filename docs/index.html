@@ -332,6 +332,44 @@
     .pop.p3 { animation-delay: 0.31s; } .pop.p4 { animation-delay: 0.44s; }
     .pop.p5 { animation-delay: 0.57s; } .pop.p6 { animation-delay: 0.7s; }
 
+    /* ---------------- Small-screen optimization ---------------- */
+    @media (max-width: 600px) {
+      .wrap { padding: 0 18px; }
+      section { padding: 72px 0; }
+      .sec-head { margin-bottom: 40px; }
+
+      /* hero: tighten vertical rhythm; .hero is also .wrap, and this shorthand
+         would zero its 18px gutter, so restore the left/right padding here */
+      .hero { padding: 52px 18px; }
+      .app-mark { width: 88px; height: 88px; border-radius: 22px; margin-bottom: 24px; }
+      .eyebrow { font-size: 12px; padding: 6px 13px; margin-bottom: 22px; }
+      .hero h1 { margin-bottom: 20px; }
+      .hero p.lead { margin-bottom: 30px; }
+
+      /* CTAs stack full-width so they're easy thumb targets */
+      .cta-row { flex-direction: column; align-items: stretch; gap: 12px; }
+      .btn { justify-content: center; width: 100%; padding: 15px 22px; }
+
+      .demo-stage { margin-top: 40px; }
+      .demo-frame { padding: 8px; border-radius: 20px; }
+
+      /* cards: trim padding and gaps to reclaim width */
+      .bento, .steps, .install-grid { gap: 12px; }
+      .card { padding: 22px; }
+      .step { padding: 26px 22px; }
+      .install-card { padding: 24px; }
+
+      /* let the long quarantine command wrap instead of clipping */
+      .term { flex-direction: column; align-items: stretch; gap: 10px; }
+      .term code { white-space: normal; word-break: break-all; }
+      .term button { align-self: flex-end; }
+
+      /* footer stacks instead of scattering across the row */
+      .foot-inner { flex-direction: column; align-items: flex-start; gap: 20px; }
+      .foot-links { flex-wrap: wrap; gap: 18px 22px; }
+      .copyright { margin-top: 4px; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; }
       .reveal { opacity: 1; transform: none; } .pop { opacity: 1; transform: none; }
