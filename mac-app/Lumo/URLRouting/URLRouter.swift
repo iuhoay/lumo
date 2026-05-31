@@ -14,18 +14,28 @@ enum URLRouter {
     /// `clipboard` is the current pasteboard string, used only when `via=clipboard`
     /// (the long-text fallback, since custom-scheme URLs have a length limit).
     static func parse(_ url: URL, clipboard: String?) -> TranslationRequest? {
+        parse(url, clipboard: clipboard, schemes: registeredSchemes)
+    }
+
+    /// As `parse(_:clipboard:)`, but with the accepted URL schemes injected so
+    /// tests can validate routing without relying on the bundle's registered
+    /// schemes. `schemes` are matched case-insensitively (pass lowercased).
+    static func parse(_ url: URL, clipboard: String?, schemes: Set<String>) -> TranslationRequest? {
         guard let scheme = url.scheme?.lowercased(),
-              registeredSchemes.contains(scheme) else { return nil }
+              schemes.contains(scheme) else { return nil }
 
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
         let items = components?.queryItems ?? []
-        func value(_ name: String) -> String? { items.first { $0.name == name }?.value }
+        func value(_ name: String) -> String? {
+            items.first { $0.name == name }?.value
+        }
 
         let mode = TranslationMode(rawValue: value("mode") ?? "translate") ?? .translate
 
         let rawText = value("via") == "clipboard" ? clipboard : value("text")
         guard let trimmed = rawText?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !trimmed.isEmpty else {
+              !trimmed.isEmpty
+        else {
             return nil
         }
         return TranslationRequest(text: trimmed, mode: mode)
