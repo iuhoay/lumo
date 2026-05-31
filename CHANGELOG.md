@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-05-31
+
+### Added
+
+- Editable input mode in the translation window: the captured selection now
+  appears in an editable field, so you can tweak or correct it before running
+  translate, polish, or summarize — and read either the input or the result
+  aloud.
+
 ### Fixed
 
 - Translation popup no longer clips its toolbar buttons (retranslate, copy,
@@ -60,7 +69,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Native menu-bar app** (`mac-app/`) — talks to the LLM provider, streams
     the result into a window, keeps a history, and can read it aloud.
 
-[Unreleased]: https://github.com/iuhoay/lumo/compare/v0.1.4...HEAD
+[Unreleased]: https://github.com/iuhoay/lumo/compare/v0.1.5...HEAD
+[0.1.5]: https://github.com/iuhoay/lumo/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/iuhoay/lumo/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/iuhoay/lumo/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/iuhoay/lumo/compare/v0.1.1...v0.1.2
