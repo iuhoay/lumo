@@ -43,6 +43,10 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.iuhoay.lumo
         PRODUCT_NAME: Lumo
+        # Pin the Swift module name so `@testable import Lumo` resolves in every
+        # config — Debug overrides PRODUCT_NAME to "Lumo Dev", which would
+        # otherwise make the module "Lumo_Dev".
+        PRODUCT_MODULE_NAME: Lumo
         APP_URL_SCHEME: lumo
         APP_DISPLAY_NAME: Lumo
         GENERATE_INFOPLIST_FILE: "NO"
@@ -90,3 +94,30 @@ targets:
         # Allow plain-HTTP endpoints too (e.g. local Ollama). DeepSeek/OpenAI are HTTPS.
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true
+    # Run the unit tests with `-scheme Lumo` (what `xcodebuild test` and CI use).
+    scheme:
+      testTargets:
+        - LumoTests
+      gatherCoverageData: true
+
+  # Unit tests (Swift Testing). App-hosted via the Lumo dependency so
+  # `@testable import Lumo` works. TEST_HOST is set per-config because the Debug
+  # build renames the host app to "Lumo Dev".
+  LumoTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: LumoTests
+    dependencies:
+      - target: Lumo
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: "YES"
+        PRODUCT_BUNDLE_IDENTIFIER: com.iuhoay.lumo.tests
+        BUNDLE_LOADER: "$(TEST_HOST)"
+      configs:
+        Debug:
+          TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Lumo Dev.app/Contents/MacOS/Lumo Dev"
+        Release:
+          TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Lumo.app/Contents/MacOS/Lumo"

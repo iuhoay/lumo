@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Build and test
+        working-directory: mac-app
+        run: |
+          brew install xcodegen
+          xcodegen generate
+          # Ad-hoc signing only (matches the release build); no Developer ID or
+          # notarization. CODE_SIGNING_ALLOWED=YES so Xcode signs the embedded
+          # Sparkle.framework inside-out during the build.
+          xcodebuild test -project Lumo.xcodeproj -scheme Lumo \
+            -destination 'platform=macOS' -configuration Debug \
+            CODE_SIGNING_ALLOWED=YES
