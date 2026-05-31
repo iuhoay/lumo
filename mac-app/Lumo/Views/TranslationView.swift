@@ -7,6 +7,9 @@ struct TranslationView: View {
     @ObservedObject private var speaker = Speaker.shared
     @FocusState private var inputFocused: Bool
     @State private var didCopy = false
+    /// Bumped on every copy so the checkmark-reset task restarts even when
+    /// `didCopy` is already true (rapid re-copies keep the confirmation fresh).
+    @State private var copyToken = 0
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -201,8 +204,10 @@ struct TranslationView: View {
         .buttonStyle(IconButtonStyle())
         .help(didCopy ? "Copied" : "Copy result")
         .disabled(model.output.isEmpty)
-        // Revert the checkmark a beat after copying.
-        .task(id: didCopy) {
+        // Revert the checkmark a beat after copying. Keyed on copyToken (not
+        // didCopy) so back-to-back copies restart the timer instead of letting
+        // the first one's reset fire early.
+        .task(id: copyToken) {
             guard didCopy else { return }
             try? await Task.sleep(for: .seconds(1.2))
             didCopy = false
@@ -219,6 +224,7 @@ struct TranslationView: View {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(model.output, forType: .string)
         didCopy = true
+        copyToken &+= 1
     }
 }
 

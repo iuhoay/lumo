@@ -63,13 +63,16 @@ final class AppModel: ObservableObject {
         focusInputToken &+= 1
     }
 
-    /// (Re)runs translation for the current input text and mode. No-op on blank
-    /// input — the Translate button is disabled then, but Cmd+Return or a mode
-    /// switch can still route here.
+    /// (Re)runs translation for the current input text and mode. Always cancels
+    /// any in-flight request first, so clearing the input mid-stream (then a mode
+    /// switch) doesn't leave a stale task running. No-op on blank input.
     func translate() {
-        let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !text.isEmpty else { return }
         task?.cancel()
+        let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else {
+            isLoading = false
+            return
+        }
         output = ""
         errorText = nil
         isLoading = true
@@ -119,12 +122,12 @@ final class AppModel: ObservableObject {
     }
 
     /// Switch mode (from the window picker). Re-run only when a translation is
-    /// already on screen or in flight, so picking a mode in a fresh, empty window
-    /// doesn't fire an unwanted request.
+    /// already on screen (a result or an error) or in flight, so picking a mode
+    /// in a fresh, empty window doesn't fire an unwanted request.
     func setMode(_ newMode: TranslationMode) {
         guard mode != newMode else { return }
         mode = newMode
-        if isLoading || !output.isEmpty {
+        if isLoading || !output.isEmpty || errorText != nil {
             translate()
         }
     }
