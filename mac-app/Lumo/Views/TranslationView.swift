@@ -17,7 +17,7 @@ struct TranslationView: View {
 
             HStack {
                 sectionLabel("Original")
-                speakButton(model.inputText, disabled: model.inputText.isEmpty)
+                speakButton(model.inputText)
                 Spacer()
             }
             inputField
@@ -40,7 +40,7 @@ struct TranslationView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                speakButton(model.output, disabled: model.output.isEmpty)
+                speakButton(model.output)
                 copyButton
                 Spacer()
                 if model.isLoading { ProgressView().controlSize(.small) }
@@ -179,7 +179,7 @@ struct TranslationView: View {
             .frame(width: 18, height: 18)
     }
 
-    private func speakButton(_ text: String, disabled: Bool = false) -> some View {
+    private func speakButton(_ text: String) -> some View {
         let isActive = speaker.isSpeaking && speaker.currentText == text
         return Button {
             if isActive { speaker.stop() } else { speaker.speak(text) }
@@ -191,7 +191,9 @@ struct TranslationView: View {
         }
         .buttonStyle(IconButtonStyle())
         .help(isActive ? "Stop" : "Read aloud")
-        .disabled(disabled)
+        // Disable on whitespace-only too: Speaker.speak trims and no-ops, so an
+        // enabled button there would feel broken. Matches translateDisabled.
+        .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
     }
 
     private var copyButton: some View {

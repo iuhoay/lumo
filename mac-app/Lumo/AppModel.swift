@@ -70,6 +70,11 @@ final class AppModel: ObservableObject {
         task?.cancel()
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else {
+            // Nothing to translate: clear any prior result so a stale output
+            // doesn't linger under a now-changed mode label.
+            output = ""
+            errorText = nil
+            resolvedTarget = ""
             isLoading = false
             return
         }

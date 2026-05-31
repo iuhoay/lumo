@@ -361,6 +361,16 @@
         }
       }
     },
+    "Translate (⌘↵)" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻译（⌘↵）"
+          }
+        }
+      }
+    },
     "Translating…" : {
       "localizations" : {
         "zh-Hans" : {
