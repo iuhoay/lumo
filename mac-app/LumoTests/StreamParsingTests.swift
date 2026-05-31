@@ -42,8 +42,14 @@ struct StreamParsingTests {
             queue.removeAll()
         }
 
-        override class func canInit(with _: URLRequest) -> Bool {
-            true
+        /// The host this suite's `ChatRequest`s target. Used to scope interception.
+        static let interceptedHost = "example.test"
+
+        override class func canInit(with request: URLRequest) -> Bool {
+            // Only intercept this suite's own requests. Returning `true` for every
+            // request would capture all URLSession traffic in the test process
+            // while registered — including the host app's Sparkle update check.
+            request.url?.host == interceptedHost
         }
 
         override class func canonicalRequest(for request: URLRequest) -> URLRequest {
