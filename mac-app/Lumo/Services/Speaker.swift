@@ -2,18 +2,23 @@ import AVFoundation
 import Foundation
 
 /// Reads text aloud with the system speech synthesizer, picking a voice
-/// based on whether the text is Chinese. Publishes `isSpeaking`/`currentText`
-/// so a specific speak button can show an active "stop" state while *its* text
-/// is playing.
+/// based on whether the text is Chinese. Publishes `isSpeaking`/`currentSource`
+/// so a specific speak button can show an active "stop" state while *it* is
+/// playing.
 @MainActor
 final class Speaker: NSObject, ObservableObject {
     static let shared = Speaker()
+
+    /// Which control started the current playback. Keyed on instead of the spoken
+    /// text so the stop state stays correct even when two controls share the same
+    /// text or the text changes under a running playback (e.g. streamed output).
+    enum Source: Equatable { case input, result }
+
     private let synthesizer = AVSpeechSynthesizer()
 
     @Published private(set) var isSpeaking = false
-    /// The text currently being spoken (nil when idle). A button compares its
-    /// own text against this to decide whether to show "stop".
-    @Published private(set) var currentText: String?
+    /// The control whose text is currently playing (nil when idle).
+    @Published private(set) var currentSource: Source?
 
     /// Identity of the in-flight utterance. The delegate clears state only when
     /// the finishing utterance is still the current one, so restarting playback
@@ -25,7 +30,7 @@ final class Speaker: NSObject, ObservableObject {
         synthesizer.delegate = self
     }
 
-    func speak(_ text: String) {
+    func speak(_ text: String, source: Source) {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
 
@@ -36,7 +41,7 @@ final class Speaker: NSObject, ObservableObject {
         let utterance = AVSpeechUtterance(string: trimmed)
         utterance.voice = AVSpeechSynthesisVoice(language: LanguageDetector.isChinese(trimmed) ? "zh-CN" : "en-US")
         currentUtterance = utterance
-        currentText = text
+        currentSource = source
         isSpeaking = true
         synthesizer.speak(utterance)
     }
@@ -48,7 +53,7 @@ final class Speaker: NSObject, ObservableObject {
     private func finish(_ utterance: AVSpeechUtterance) {
         guard utterance === currentUtterance else { return }
         currentUtterance = nil
-        currentText = nil
+        currentSource = nil
         isSpeaking = false
     }
 }

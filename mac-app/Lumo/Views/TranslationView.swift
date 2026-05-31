@@ -17,7 +17,7 @@ struct TranslationView: View {
 
             HStack {
                 sectionLabel("Original")
-                speakButton(model.inputText)
+                speakButton(model.inputText, source: .input)
                 Spacer()
             }
             inputField
@@ -40,7 +40,7 @@ struct TranslationView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                speakButton(model.output)
+                speakButton(model.output, source: .result)
                 copyButton
                 Spacer()
                 if model.isLoading { ProgressView().controlSize(.small) }
@@ -179,10 +179,10 @@ struct TranslationView: View {
             .frame(width: 18, height: 18)
     }
 
-    private func speakButton(_ text: String) -> some View {
-        let isActive = speaker.isSpeaking && speaker.currentText == text
+    private func speakButton(_ text: String, source: Speaker.Source) -> some View {
+        let isActive = speaker.isSpeaking && speaker.currentSource == source
         return Button {
-            if isActive { speaker.stop() } else { speaker.speak(text) }
+            if isActive { speaker.stop() } else { speaker.speak(text, source: source) }
         } label: {
             toolbarIcon(
                 isActive ? "stop.fill" : "speaker.wave.2",
