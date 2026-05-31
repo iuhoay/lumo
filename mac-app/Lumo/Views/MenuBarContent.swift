@@ -1,11 +1,15 @@
-import SwiftUI
 import AppKit
+import SwiftUI
 
 /// Menu shown when clicking the menu-bar icon.
 struct MenuBarContent: View {
     @ObservedObject private var updater = UpdaterController.shared
 
     var body: some View {
+        Button("New Translation…") {
+            AppModel.shared.newTranslation()
+        }
+        Divider()
         Button("About Lumo") {
             // LSUIElement apps have no standard app menu, so the system "About"
             // item never appears — surface it here. The panel auto-reads the

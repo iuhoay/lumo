@@ -51,6 +51,16 @@
         }
       }
     },
+    "Copied" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已复制"
+          }
+        }
+      }
+    },
     "Copy result" : {
       "localizations" : {
         "zh-Hans" : {
@@ -107,6 +117,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "模型"
+          }
+        }
+      }
+    },
+    "New Translation…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新建翻译…"
           }
         }
       }
@@ -291,6 +311,16 @@
         }
       }
     },
+    "Stop" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "停止"
+          }
+        }
+      }
+    },
     "Summarize" : {
       "localizations" : {
         "zh-Hans" : {
@@ -331,6 +361,16 @@
         }
       }
     },
+    "Translate (⌘↵)" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻译（⌘↵）"
+          }
+        }
+      }
+    },
     "Translating…" : {
       "localizations" : {
         "zh-Hans" : {
@@ -347,6 +387,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "译文"
+          }
+        }
+      }
+    },
+    "Type or paste text here…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在此输入或粘贴文本…"
           }
         }
       }
@@ -377,16 +427,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "在 GitHub 上查看"
-          }
-        }
-      }
-    },
-    "Waiting for input…" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "等待输入…"
           }
         }
       }

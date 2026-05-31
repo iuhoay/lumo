@@ -1,5 +1,5 @@
-import SwiftUI
 import AppKit
+import SwiftUI
 
 /// Central app state. Shared singleton so the AppKit delegate (which handles
 /// the URL scheme) and the SwiftUI scenes can talk to the same instance.
@@ -7,12 +7,20 @@ import AppKit
 final class AppModel: ObservableObject {
     static let shared = AppModel()
 
-    @Published var request: TranslationRequest?
+    /// Editable source text shown in the window's "Original" field — the single
+    /// source of truth for what gets translated. Filled by a PopClip / history
+    /// hand-off, or typed/pasted directly in input mode.
+    @Published var inputText: String = ""
+    /// Currently selected action (translate / polish / summarize).
+    @Published var mode: TranslationMode = .translate
     @Published var output: String = ""
     @Published var resolvedTarget: String = ""
     @Published var isLoading: Bool = false
     @Published var errorText: String?
     @Published var isPinned: Bool = false
+    /// Bumped to ask the view to move keyboard focus into the input field
+    /// (e.g. when the window opens empty for a new translation).
+    @Published var focusInputToken: Int = 0
 
     private lazy var windowController = TranslationWindowController(model: self)
     private var task: Task<Void, Never>?
@@ -30,24 +38,54 @@ final class AppModel: ObservableObject {
         windowController.close()
     }
 
-    /// Entry point for a hand-off from PopClip.
+    /// Entry point for a hand-off from PopClip (or re-running a history item):
+    /// fill the input with the supplied text and translate immediately.
     func handle(_ request: TranslationRequest) {
-        self.request = request
+        inputText = request.text
+        mode = request.mode
         windowController.present()
-        retranslate()
+        // Put focus in the editable input (so it's ready to tweak/re-translate)
+        // rather than letting a toolbar button take keyboard focus + focus ring.
+        focusInputToken &+= 1
+        translate()
     }
 
-    /// (Re)runs translation for the current request and mode.
-    func retranslate() {
-        guard let request else { return }
+    /// Open the window empty for manual input ("New Translation…"), then ask the
+    /// view to focus the input field so the user can start typing right away.
+    func newTranslation() {
         task?.cancel()
+        inputText = ""
+        output = ""
+        errorText = nil
+        resolvedTarget = ""
+        isLoading = false
+        windowController.present()
+        focusInputToken &+= 1
+    }
+
+    /// (Re)runs translation for the current input text and mode. Always cancels
+    /// any in-flight request first, so clearing the input mid-stream (then a mode
+    /// switch) doesn't leave a stale task running. No-op on blank input.
+    func translate() {
+        task?.cancel()
+        let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else {
+            // Nothing to translate: clear any prior result so a stale output
+            // doesn't linger under a now-changed mode label.
+            output = ""
+            errorText = nil
+            resolvedTarget = ""
+            isLoading = false
+            return
+        }
         output = ""
         errorText = nil
         isLoading = true
 
         let settings = AppSettings.shared
+        let mode = self.mode
         let target = LanguageDetector.target(
-            for: request.text,
+            for: text,
             whenChinese: settings.targetWhenChinese,
             otherwise: settings.targetWhenOther
         )
@@ -56,8 +94,8 @@ final class AppModel: ObservableObject {
             baseURL: settings.resolvedBaseURL(for: settings.provider),
             apiKey: settings.apiKey(for: settings.provider),
             model: settings.model,
-            system: request.mode.systemPrompt(target: target),
-            user: request.text
+            system: mode.systemPrompt(target: target),
+            user: text
         )
         let service = ServiceFactory.make(for: settings.provider)
 
@@ -71,8 +109,8 @@ final class AppModel: ObservableObject {
                 let finalOutput = self?.output ?? ""
                 if !finalOutput.isEmpty {
                     HistoryStore.shared.add(HistoryItem(
-                        mode: request.mode,
-                        sourceText: request.text,
+                        mode: mode,
+                        sourceText: text,
                         outputText: finalOutput,
                         target: target,
                         provider: settings.provider,
@@ -88,11 +126,14 @@ final class AppModel: ObservableObject {
         }
     }
 
-    /// Switch mode (from the window picker) and re-run.
-    func setMode(_ mode: TranslationMode) {
-        guard var request, request.mode != mode else { return }
-        request.mode = mode
-        self.request = request
-        retranslate()
+    /// Switch mode (from the window picker). Re-run only when a translation is
+    /// already on screen (a result or an error) or in flight, so picking a mode
+    /// in a fresh, empty window doesn't fire an unwanted request.
+    func setMode(_ newMode: TranslationMode) {
+        guard mode != newMode else { return }
+        mode = newMode
+        if isLoading || !output.isEmpty || errorText != nil {
+            translate()
+        }
     }
 }

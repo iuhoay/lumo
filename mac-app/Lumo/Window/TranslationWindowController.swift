@@ -16,9 +16,17 @@ enum GlassPanelMetrics {
 @MainActor
 private final class TranslationPanelWindow: NSWindow {
     var onCancel: (() -> Void)?
-    override var canBecomeKey: Bool { true }
-    override var canBecomeMain: Bool { true }
-    override func cancelOperation(_ sender: Any?) { onCancel?() }
+    override var canBecomeKey: Bool {
+        true
+    }
+
+    override var canBecomeMain: Bool {
+        true
+    }
+
+    override func cancelOperation(_: Any?) {
+        onCancel?()
+    }
 }
 
 /// Owns the floating translation window: a single reusable borderless NSWindow
@@ -60,7 +68,7 @@ final class TranslationWindowController {
         // means no traffic-light buttons floating detached above the panel, and
         // the glass fills edge-to-edge with its own rounded corners.
         let window = TranslationPanelWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 440, height: 360),
+            contentRect: NSRect(x: 0, y: 0, width: 440, height: 340),
             styleMask: [.borderless, .resizable],
             backing: .buffered,
             defer: false
@@ -78,7 +86,7 @@ final class TranslationWindowController {
         window.isReleasedWhenClosed = false
         // Keep in sync with TranslationView's frame minWidth: a narrower window
         // clips the header toolbar's trailing buttons under the rounded mask.
-        window.minSize = NSSize(width: 440, height: 240)
+        window.minSize = NSSize(width: 440, height: 300)
 
         // Clip the content view's layer to the same rounded rect as the glass.
         // Without this, the hosting view fills the square window bounds and a
