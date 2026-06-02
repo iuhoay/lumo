@@ -66,9 +66,7 @@ final class AppModel: ObservableObject {
     /// Non-blank text on the general pasteboard, trimmed; `nil` when empty/none.
     /// Drives the empty window's "press ⇥ to paste" hint and the ⇥ shortcut.
     var clipboardText: String? {
-        let text = NSPasteboard.general.string(forType: .string)?
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        return (text?.isEmpty == false) ? text : nil
+        normalizedClipboardText(NSPasteboard.general.string(forType: .string))
     }
 
     /// ⇥ in the empty window: pull the clipboard in and translate immediately
@@ -153,4 +151,14 @@ final class AppModel: ObservableObject {
             translate()
         }
     }
+}
+
+/// Normalize raw pasteboard text for the ⇥-paste shortcut: trim surrounding
+/// whitespace/newlines and return `nil` when nothing meaningful remains (so a
+/// blank or whitespace-only clipboard neither shows the hint nor fires ⇥).
+/// A pure free function — like `trimmedBaseURL` — so the logic is unit-testable
+/// without reaching into `NSPasteboard.general`.
+func normalizedClipboardText(_ raw: String?) -> String? {
+    let text = raw?.trimmingCharacters(in: .whitespacesAndNewlines)
+    return (text?.isEmpty == false) ? text : nil
 }
