@@ -1,0 +1,153 @@
+#!/usr/bin/env bash
+#
+# Release pipeline for the Lumo mac app, extracted from
+# .github/workflows/release.yml so the logic is shellcheck-lintable and can be
+# inspected/run outside CI. The workflow invokes the three subcommands as
+# separate steps (so secrets stay scoped per step):
+#
+#   bin/release build      xcodegen + universal Release build + ad-hoc sign + zip
+#   bin/release appcast    EdDSA-sign Lumo.zip and write mac-app/appcast.xml
+#   bin/release publish    create the GitHub Release with notes + assets
+#
+# Driven by environment variables GitHub Actions already provides; each
+# subcommand documents the ones it requires (so a local run fails fast with a
+# clear message instead of misbehaving).
+set -euo pipefail
+
+# Must match the Sparkle version embedded via SPM in mac-app/project.yml: the
+# sign_update CLI has to match the framework that will verify the signature.
+SPARKLE_VERSION="${SPARKLE_VERSION:-2.9.2}"
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+MAC_APP_DIR="$ROOT/mac-app"
+# Auto-provided in CI; defaulted so the appcast/publish steps can be run locally.
+GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-iuhoay/lumo}"
+
+build() {
+  cd "$MAC_APP_DIR"
+  command -v xcodegen >/dev/null 2>&1 || brew install xcodegen
+  xcodegen generate
+  # CFBundleVersion = monotonic git commit count (was hardcoded "1", which would
+  # have hidden every update from Sparkle, which compares CFBundleVersion).
+  local build_number
+  build_number="$(git -C "$ROOT" rev-list --count HEAD)"
+  xcodebuild -project Lumo.xcodeproj -target Lumo -configuration Release \
+    SYMROOT="$PWD/build" ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO \
+    CURRENT_PROJECT_VERSION="$build_number" build
+  # Xcode ad-hoc signs the app AND the embedded Sparkle.framework + its nested
+  # XPC services inside-out during the build. Verify that nested signing held — a
+  # broken Sparkle helper signature only surfaces at update time otherwise.
+  codesign --verify --deep --strict --verbose=2 build/Release/Lumo.app
+  ditto -c -k --keepParent build/Release/Lumo.app Lumo.zip
+}
+
+appcast() {
+  : "${SPARKLE_PRIVATE_KEY:?set SPARKLE_PRIVATE_KEY (the Sparkle EdDSA private key)}"
+  : "${GITHUB_REF_NAME:?set GITHUB_REF_NAME (the vX.Y.Z tag)}"
+  cd "$MAC_APP_DIR"
+  # Fetch the Sparkle CLI tools (sign_update) matching the embedded framework.
+  curl -fsSL -o sparkle.tar.xz \
+    "https://github.com/sparkle-project/Sparkle/releases/download/${SPARKLE_VERSION}/Sparkle-${SPARKLE_VERSION}.tar.xz"
+  mkdir -p sparkle-tools && tar -xJf sparkle.tar.xz -C sparkle-tools
+  # The inline private-key flag was removed in Sparkle 2.x — write the secret to
+  # a temp keyfile (printf, no trailing newline) and pass that.
+  local keyfile sig_attrs
+  keyfile="$(mktemp)"
+  printf '%s' "$SPARKLE_PRIVATE_KEY" > "$keyfile"
+  # Prints: sparkle:edSignature="…" length="…"
+  sig_attrs="$(sparkle-tools/bin/sign_update Lumo.zip --ed-key-file "$keyfile")"
+  rm -f "$keyfile"
+  # Read versions back out of the built binary so the appcast can never drift
+  # from what the app actually reports.
+  local plist short_version build_version pubdate download_url notes_url notes_md notes_block
+  plist="build/Release/Lumo.app/Contents/Info.plist"
+  short_version="$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$plist")"
+  build_version="$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" "$plist")"
+  pubdate="$(LC_ALL=C date -u "+%a, %d %b %Y %H:%M:%S +0000")"
+  download_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/Lumo.zip"
+  notes_url="https://github.com/${GITHUB_REPOSITORY}/releases/tag/${GITHUB_REF_NAME}"
+  # Pull this version's CHANGELOG section so Sparkle shows real "what's new" notes
+  # in the in-app updater. Sparkle 2.9+ renders Markdown natively via
+  # <description sparkle:format="markdown"> (our deployment target is macOS 26,
+  # well past the macOS 12 floor that needs), so we embed the raw CHANGELOG
+  # markdown — no HTML conversion.
+  #
+  # Sparkle prefers <sparkle:releaseNotesLink> over an inline <description>, so
+  # the two must be mutually exclusive: emit the inline notes when we have them,
+  # and only fall back to the link (the GitHub release tag page) when the
+  # CHANGELOG section is missing. Emitting both makes Sparkle embed the full
+  # GitHub website chrome in the tiny update window.
+  notes_md="$(python3 "$ROOT/scripts/release_notes.py" md "$GITHUB_REF_NAME")"
+  if [ -n "$notes_md" ]; then
+    notes_block="<description sparkle:format=\"markdown\"><![CDATA[
+${notes_md}
+]]></description>"
+  else
+    notes_block="<sparkle:releaseNotesLink>${notes_url}</sparkle:releaseNotesLink>"
+  fi
+  cat > appcast.xml <<EOF
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+<channel>
+<title>Lumo</title>
+<item>
+<title>${short_version}</title>
+<pubDate>${pubdate}</pubDate>
+<sparkle:version>${build_version}</sparkle:version>
+<sparkle:shortVersionString>${short_version}</sparkle:shortVersionString>
+<sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+${notes_block}
+<enclosure url="${download_url}" type="application/octet-stream" ${sig_attrs} />
+</item>
+</channel>
+</rss>
+EOF
+  echo "--- appcast.xml ---"; cat appcast.xml
+}
+
+publish() {
+  : "${GH_TOKEN:?set GH_TOKEN (a token gh can use to create the release)}"
+  : "${GITHUB_REF_NAME:?set GITHUB_REF_NAME (the vX.Y.Z tag)}"
+  # Body = this version's CHANGELOG section (if any) + install steps;
+  # --generate-notes then appends the auto commit changelog after it (GitHub API:
+  # generated notes are appended when a body is provided).
+  local notes_file version_md
+  notes_file="$(mktemp)"
+  {
+    version_md="$(python3 "$ROOT/scripts/release_notes.py" md "$GITHUB_REF_NAME")"
+    if [ -n "$version_md" ]; then
+      printf '## What'\''s New\n\n%s\n\n---\n\n' "$version_md"
+    fi
+    cat <<'EOF'
+## Install
+
+1. Download `Lumo.zip` below and unzip it.
+2. Move `Lumo.app` to `/Applications`.
+3. The app is unsigned, so clear the quarantine flag once before the first launch:
+
+   ```sh
+   xattr -dr com.apple.quarantine /Applications/Lumo.app
+   ```
+
+4. Lumo runs as a menu-bar item (no Dock icon) — look for it in the status bar.
+
+From here on, Lumo updates itself: it checks in the background and you can
+also trigger it from the menu bar via "检查更新…". You will not need to
+clear quarantine again — Sparkle handles that for downloaded updates.
+
+---
+EOF
+  } > "$notes_file"
+  gh release create "$GITHUB_REF_NAME" "$MAC_APP_DIR/Lumo.zip" "$MAC_APP_DIR/appcast.xml" \
+    --notes-file "$notes_file" --generate-notes
+}
+
+case "${1:-}" in
+  build) build ;;
+  appcast) appcast ;;
+  publish) publish ;;
+  *)
+    echo "usage: bin/release {build|appcast|publish}" >&2
+    exit 2
+    ;;
+esac

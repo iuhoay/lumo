@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
-"""Extract a release's section from CHANGELOG.md, as markdown or HTML.
+"""Extract a release's section from CHANGELOG.md as markdown.
 
-The release workflow uses this to feed real "what's new" notes into two places:
-- the GitHub release body (markdown), and
-- the Sparkle appcast <description> (HTML, shown in the in-app updater).
+The release workflow feeds this same markdown into two places:
+- the GitHub release body, and
+- the Sparkle appcast <description sparkle:format="markdown">, which Sparkle
+  2.9+ renders natively in the in-app updater (no HTML conversion needed).
 
 Usage:
-    release_notes.py md   <version>   # e.g. 0.1.3 or v0.1.3
-    release_notes.py html <version>
+    release_notes.py md <version>   # e.g. 0.1.3 or v0.1.3
 
 Prints nothing (exit 0) when the version has no section, so the workflow can
 fall back gracefully instead of failing the release.
 """
 
-import html
 import re
 import sys
 from pathlib import Path
@@ -36,63 +35,13 @@ def extract(version: str) -> str:
     return "\n".join(body).strip("\n")
 
 
-def inline(text: str) -> str:
-    """Render inline markdown (links, bold, code) to HTML, escaping everything else."""
-    text = html.escape(text)
-    text = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r'<a href="\2">\1</a>', text)
-    text = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", text)
-    text = re.sub(r"`([^`]+)`", r"<code>\1</code>", text)
-    return text
-
-
-def to_html(md: str) -> str:
-    """Convert our changelog subset (### headers + bullet lists) to HTML.
-
-    Bullets may wrap onto continuation lines indented by two spaces; join those
-    back onto the bullet before rendering.
-    """
-    joined: list[str] = []
-    for line in md.splitlines():
-        if line[:2] == "  " and joined and joined[-1].lstrip().startswith("- "):
-            joined[-1] = joined[-1].rstrip() + " " + line.strip()
-        else:
-            joined.append(line)
-
-    out: list[str] = []
-    in_list = False
-
-    def close_list() -> None:
-        nonlocal in_list
-        if in_list:
-            out.append("</ul>")
-            in_list = False
-
-    for line in joined:
-        stripped = line.strip()
-        if stripped.startswith("### "):
-            close_list()
-            out.append(f"<h3>{inline(stripped[4:])}</h3>")
-        elif stripped.startswith("- "):
-            if not in_list:
-                out.append("<ul>")
-                in_list = True
-            out.append(f"<li>{inline(stripped[2:])}</li>")
-        elif stripped:
-            close_list()
-            out.append(f"<p>{inline(stripped)}</p>")
-    close_list()
-    return "\n".join(out)
-
-
 def main() -> int:
-    if len(sys.argv) != 3 or sys.argv[1] not in {"md", "html"}:
-        print("usage: release_notes.py {md|html} <version>", file=sys.stderr)
+    if len(sys.argv) != 3 or sys.argv[1] != "md":
+        print("usage: release_notes.py md <version>", file=sys.stderr)
         return 2
-    mode = sys.argv[1]
     version = sys.argv[2]
     version = version[1:] if version.startswith("v") else version
-    md = extract(version)
-    sys.stdout.write(to_html(md) if mode == "html" else md)
+    sys.stdout.write(extract(version))
     return 0
 
 
