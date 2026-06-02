@@ -1,3 +1,4 @@
+import KeyboardShortcuts
 import SwiftUI
 
 struct SettingsView: View {
@@ -33,6 +34,14 @@ struct SettingsView: View {
             Section("Language (translate mode)") {
                 TextField("Chinese input → translate to", text: $settings.targetWhenChinese)
                 TextField("Non-Chinese input → translate to", text: $settings.targetWhenOther)
+            }
+
+            Section("Shortcut") {
+                // Recording here updates the global hotkey live (AppDelegate
+                // registered the handler at launch against the same name).
+                // Recorder's title is a plain String, so localize it explicitly
+                // via the xcstrings table rather than a LocalizedStringKey literal.
+                KeyboardShortcuts.Recorder(String(localized: "New Translation…"), name: .newTranslation)
             }
         }
         .formStyle(.grouped)

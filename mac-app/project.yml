@@ -12,6 +12,11 @@ packages:
   Sparkle:
     url: https://github.com/sparkle-project/Sparkle
     from: "2.9.2"
+  # Global (system-wide) hotkey + a SwiftUI recorder for Settings. Pure Swift, no
+  # embedded framework, so it doesn't affect the ad-hoc signing dance Sparkle needs.
+  KeyboardShortcuts:
+    url: https://github.com/sindresorhus/KeyboardShortcuts
+    from: "2.4.0"
 
 settings:
   base:
@@ -36,6 +41,7 @@ targets:
       - path: Lumo
     dependencies:
       - package: Sparkle
+      - package: KeyboardShortcuts
     settings:
       # Release (base) = production entity; Debug overrides = dev entity.
       # Distinct bundle id + URL scheme + name so both can coexist without

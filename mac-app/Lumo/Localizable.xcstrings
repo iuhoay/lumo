@@ -311,6 +311,16 @@
         }
       }
     },
+    "Shortcut" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "快捷键"
+          }
+        }
+      }
+    },
     "Stop" : {
       "localizations" : {
         "zh-Hans" : {
