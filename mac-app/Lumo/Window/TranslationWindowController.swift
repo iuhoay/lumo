@@ -36,6 +36,7 @@ private final class TranslationPanelWindow: NSWindow {
 final class TranslationWindowController {
     private weak var model: AppModel?
     private var window: NSWindow?
+    private var tabMonitor: Any?
 
     init(model: AppModel) {
         self.model = model
@@ -101,7 +102,39 @@ final class TranslationWindowController {
         }
 
         self.window = window
+        installTabMonitor()
         return window
+    }
+
+    /// Watch for a bare ⇥ to pull the clipboard into the empty window and
+    /// translate. A local monitor (rather than SwiftUI `.onKeyPress`) so the tab
+    /// is caught before `TextEditor` inserts it as a literal character. Gated
+    /// hard — our window key, no modifiers, input empty, clipboard non-empty — so
+    /// it stays inert everywhere else (incl. a real Tab once the user has typed).
+    private func installTabMonitor() {
+        guard tabMonitor == nil else { return }
+        // Pull the Sendable bits off the event before hopping onto the main actor
+        // so the non-Sendable NSEvent never crosses the isolation boundary.
+        tabMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            let keyCode = event.keyCode
+            let modifiers = event.modifierFlags
+                .intersection(.deviceIndependentFlagsMask)
+                .subtracting(.capsLock)
+            let swallow = MainActor.assumeIsolated {
+                self?.handleTabKey(keyCode: keyCode, modifiers: modifiers) ?? false
+            }
+            return swallow ? nil : event // nil swallows the tab; else pass it through
+        }
+    }
+
+    private func handleTabKey(keyCode: UInt16, modifiers: NSEvent.ModifierFlags) -> Bool {
+        let kVK_Tab: UInt16 = 48
+        guard keyCode == kVK_Tab, modifiers.isEmpty,
+              window?.isKeyWindow == true,
+              let model, model.inputText.isEmpty, model.clipboardText != nil
+        else { return false }
+        model.pasteClipboardAndTranslate()
+        return true
     }
 
     /// Places the window near the pointer: below-right when there's room,

@@ -411,6 +411,16 @@
         }
       }
     },
+    "Type, or press ⇥ to paste clipboard" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输入文本，或按 ⇥ 粘贴剪贴板内容"
+          }
+        }
+      }
+    },
     "Translation History" : {
       "localizations" : {
         "zh-Hans" : {
