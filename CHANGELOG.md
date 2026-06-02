@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-06-02
+
 ### Added
 
 - Global keyboard shortcut for "New Translation…": assign a system-wide hotkey
@@ -75,7 +77,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Native menu-bar app** (`mac-app/`) — talks to the LLM provider, streams
     the result into a window, keeps a history, and can read it aloud.
 
-[Unreleased]: https://github.com/iuhoay/lumo/compare/v0.1.5...HEAD
+[Unreleased]: https://github.com/iuhoay/lumo/compare/v0.1.6...HEAD
+[0.1.6]: https://github.com/iuhoay/lumo/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/iuhoay/lumo/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/iuhoay/lumo/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/iuhoay/lumo/compare/v0.1.2...v0.1.3
