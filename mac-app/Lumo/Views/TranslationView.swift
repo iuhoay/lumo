@@ -6,6 +6,10 @@ struct TranslationView: View {
     @EnvironmentObject private var model: AppModel
     @ObservedObject private var speaker = Speaker.shared
     @FocusState private var inputFocused: Bool
+    /// Whether the clipboard currently holds text — gates the empty window's
+    /// "press ⇥ to paste" hint. Refreshed on present and on app re-activation
+    /// (not per-render) so we don't read the pasteboard during `body`.
+    @State private var clipboardHasText = false
     @State private var didCopy = false
     /// Bumped on every copy so the checkmark-reset task restarts even when
     /// `didCopy` is already true (rapid re-copies keep the confirmation fresh).
@@ -62,12 +66,28 @@ struct TranslationView: View {
         // to the next runloop tick: setting @FocusState synchronously during
         // window presentation races AppKit's initial first-responder assignment
         // and loses, leaving the focus ring on a toolbar button instead.
-        .onAppear { focusInputSoon() }
-        .onChange(of: model.focusInputToken) { _, _ in focusInputSoon() }
+        .onAppear { onPresent() }
+        .onChange(of: model.focusInputToken) { _, _ in onPresent() }
+        // Catch a clipboard change made while the empty window stayed open: the
+        // panel re-activates when the user comes back to it, so refresh the hint.
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            refreshClipboardHint()
+        }
+    }
+
+    /// Runs each time the panel is shown (first appear + every reopen): focus the
+    /// input and refresh the clipboard hint for the freshly opened, empty window.
+    private func onPresent() {
+        focusInputSoon()
+        refreshClipboardHint()
     }
 
     private func focusInputSoon() {
         DispatchQueue.main.async { inputFocused = true }
+    }
+
+    private func refreshClipboardHint() {
+        clipboardHasText = model.clipboardText != nil
     }
 
     private var header: some View {
@@ -116,7 +136,9 @@ struct TranslationView: View {
             .frame(height: 64)
             .overlay(alignment: .topLeading) {
                 if model.inputText.isEmpty {
-                    Text("Type or paste text here…")
+                    Text(clipboardHasText
+                        ? "Type, or press ⇥ to paste clipboard"
+                        : "Type or paste text here…")
                         .font(.body)
                         .foregroundStyle(.secondary)
                         // Match TextEditor's text origin: ~5pt leading inset and

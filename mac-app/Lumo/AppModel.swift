@@ -63,6 +63,23 @@ final class AppModel: ObservableObject {
         focusInputToken &+= 1
     }
 
+    /// Non-blank text on the general pasteboard, trimmed; `nil` when empty/none.
+    /// Drives the empty window's "press ⇥ to paste" hint and the ⇥ shortcut.
+    var clipboardText: String? {
+        let text = NSPasteboard.general.string(forType: .string)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return (text?.isEmpty == false) ? text : nil
+    }
+
+    /// ⇥ in the empty window: pull the clipboard in and translate immediately
+    /// (same as a PopClip hand-off). No-op once the input has text or when the
+    /// clipboard is empty, so a real Tab keeps working after the user types.
+    func pasteClipboardAndTranslate() {
+        guard inputText.isEmpty, let text = clipboardText else { return }
+        inputText = text
+        translate()
+    }
+
     /// (Re)runs translation for the current input text and mode. Always cancels
     /// any in-flight request first, so clearing the input mid-stream (then a mode
     /// switch) doesn't leave a stale task running. No-op on blank input.

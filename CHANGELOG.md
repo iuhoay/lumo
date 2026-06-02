@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Press ⇥ in an empty translation window to paste the clipboard and translate
+  it in one keystroke. The placeholder advertises the shortcut only when the
+  clipboard actually holds text.
+
 ## [0.1.6] - 2026-06-02
 
 ### Added
