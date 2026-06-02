@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Global keyboard shortcut for "New Translation…": assign a system-wide hotkey
+  in Settings to open an empty translation window from any app. No shortcut is
+  set by default — pick your own under Settings → Shortcut.
+
 ## [0.1.5] - 2026-05-31
 
 ### Added
