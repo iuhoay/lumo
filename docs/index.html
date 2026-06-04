@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lumo — Translate, polish & summarize any text on macOS</title>
-  <meta name="description" content="Lumo turns any selected text into an LLM action on macOS — translate, polish, or summarize, triggered straight from PopClip. Bring your own API key. Free & open source." />
+  <meta name="description" content="Lumo is a native macOS text assistant for translating, polishing, and summarizing text from the menu bar, a global shortcut, the clipboard, or PopClip. Bring your own API key. Free & open source." />
 
   <!-- Social preview -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Lumo — Translate, polish & summarize any text on macOS" />
-  <meta property="og:description" content="Turn any selection into an LLM action, right where you're reading. Triggered from PopClip. Bring your own API key." />
+  <meta property="og:description" content="Translate, polish, and summarize text from anywhere on macOS. Use the menu bar, a global shortcut, clipboard input, or PopClip. Bring your own API key." />
   <meta property="og:image" content="assets/banner.png" />
   <meta name="twitter:card" content="summary_large_image" />
 
@@ -23,20 +23,20 @@
 
   <style>
     :root {
-      --bg-0: #07040f;
-      --bg-1: #0c0719;
-      --violet: #a78bfa;
-      --violet-deep: #7c5cff;
-      --magenta: #d96cf6;
-      --blue: #5b8cff;
-      --cyan: #5be6ff;
-      --ink: #f6f3ff;
-      --dim: rgba(238, 234, 255, 0.62);
-      --faint: rgba(238, 234, 255, 0.40);
-      --glass: rgba(255, 255, 255, 0.045);
-      --glass-2: rgba(255, 255, 255, 0.07);
-      --line: rgba(180, 160, 255, 0.14);
-      --line-bright: rgba(190, 170, 255, 0.30);
+      --bg-0: #f7f8f6;
+      --bg-1: #eef3f1;
+      --violet: #0f766e;
+      --violet-deep: #115e59;
+      --magenta: #c9782d;
+      --blue: #2563eb;
+      --cyan: #0891b2;
+      --ink: #18201f;
+      --dim: rgba(24, 32, 31, 0.68);
+      --faint: rgba(24, 32, 31, 0.42);
+      --glass: rgba(255, 255, 255, 0.72);
+      --glass-2: rgba(255, 255, 255, 0.92);
+      --line: rgba(28, 43, 40, 0.12);
+      --line-bright: rgba(15, 118, 110, 0.28);
       --display: "Fraunces", "Iowan Old Style", Georgia, serif;
       --body: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
       --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
@@ -58,54 +58,22 @@
       text-rendering: optimizeLegibility;
     }
 
-    /* ---- Atmosphere: deep violet night with luminous blooms + grain ---- */
+    /* ---- Atmosphere: quiet macOS utility surface with subtle structure ---- */
     .atmosphere {
       position: fixed;
       inset: 0;
       z-index: -2;
       background:
-        radial-gradient(1100px 720px at 50% -8%, rgba(124, 92, 255, 0.34), transparent 60%),
-        radial-gradient(820px 620px at 86% 4%, rgba(217, 108, 246, 0.20), transparent 58%),
-        radial-gradient(900px 700px at 8% 22%, rgba(91, 140, 255, 0.16), transparent 60%),
-        linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 42%, #05030b 100%);
-    }
-    .bloom {
-      position: fixed;
-      z-index: -1;
-      border-radius: 50%;
-      filter: blur(70px);
-      opacity: 0.5;
-      pointer-events: none;
-      animation: breathe 11s ease-in-out infinite;
-    }
-    .bloom.a { width: 560px; height: 560px; top: -180px; left: 50%; margin-left: -280px;
-      background: radial-gradient(circle, rgba(140, 96, 255, 0.55), transparent 68%); }
-    .bloom.b { width: 460px; height: 460px; top: 38%; right: -160px;
-      background: radial-gradient(circle, rgba(217, 108, 246, 0.40), transparent 68%); animation-delay: -4s; }
-    .bloom.c { width: 420px; height: 420px; bottom: -120px; left: -120px;
-      background: radial-gradient(circle, rgba(91, 140, 255, 0.38), transparent 70%); animation-delay: -7s; }
-    @keyframes breathe {
-      0%, 100% { transform: scale(1) translateY(0); opacity: 0.42; }
-      50% { transform: scale(1.12) translateY(14px); opacity: 0.6; }
+        linear-gradient(rgba(24, 32, 31, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(24, 32, 31, 0.035) 1px, transparent 1px),
+        linear-gradient(180deg, #ffffff 0%, var(--bg-0) 42%, var(--bg-1) 100%);
+      background-size: 42px 42px, 42px 42px, auto;
     }
     /* fine grain overlay for premium depth */
     .grain {
-      position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.05;
+      position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.018;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
-
-    /* drifting multilingual phrases (echoing the brand banner) */
-    .drift { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
-    .drift span {
-      position: absolute; font-family: var(--display); font-style: italic;
-      font-size: clamp(14px, 2.4vw, 26px); color: rgba(214, 200, 255, 0.10);
-      white-space: nowrap; animation: float-x 26s linear infinite;
-    }
-    .drift span:nth-child(1) { top: 16%; left: -10%; animation-duration: 34s; }
-    .drift span:nth-child(2) { top: 30%; left: -20%; animation-duration: 42s; animation-delay: -8s; }
-    .drift span:nth-child(3) { top: 64%; left: -16%; animation-duration: 38s; animation-delay: -16s; }
-    .drift span:nth-child(4) { top: 78%; left: -12%; animation-duration: 46s; animation-delay: -5s; }
-    @keyframes float-x { from { transform: translateX(0); } to { transform: translateX(130vw); } }
 
     /* ---------------- Layout ---------------- */
     .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
@@ -115,14 +83,14 @@
       position: sticky; top: 0; z-index: 50;
       backdrop-filter: blur(18px) saturate(150%);
       -webkit-backdrop-filter: blur(18px) saturate(150%);
-      background: rgba(10, 6, 22, 0.55);
+      background: rgba(247, 248, 246, 0.78);
       border-bottom: 1px solid transparent;
       transition: border-color 0.4s ease, background 0.4s ease;
     }
-    header.nav.scrolled { border-bottom-color: var(--line); background: rgba(8, 5, 18, 0.74); }
+    header.nav.scrolled { border-bottom-color: var(--line); background: rgba(255, 255, 255, 0.88); }
     .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 66px; }
-    .brand { display: flex; align-items: center; gap: 11px; font-weight: 600; font-size: 19px; letter-spacing: -0.01em; }
-    .brand img { width: 30px; height: 30px; border-radius: 8px; box-shadow: 0 0 18px rgba(140, 96, 255, 0.5); }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 600; font-size: 19px; letter-spacing: 0; }
+    .brand img { width: 30px; height: 30px; border-radius: 8px; box-shadow: 0 8px 24px rgba(24, 32, 31, 0.16); }
     .nav-links { display: flex; align-items: center; gap: 28px; }
     .nav-links a { color: var(--dim); text-decoration: none; font-size: 15px; font-weight: 500; transition: color 0.2s; }
     .nav-links a:hover { color: var(--ink); }
@@ -130,38 +98,38 @@
       color: var(--ink); border: 1px solid var(--line-bright); padding: 8px 18px; border-radius: 999px;
       background: var(--glass); transition: all 0.25s;
     }
-    .nav-links .ghost-pill:hover { background: var(--glass-2); box-shadow: 0 0 22px rgba(140, 96, 255, 0.35); }
+    .nav-links .ghost-pill:hover { background: var(--glass-2); box-shadow: 0 10px 26px rgba(15, 118, 110, 0.16); }
     @media (max-width: 720px) { .nav-links a:not(.ghost-pill) { display: none; } }
 
     /* ---------------- Hero ---------------- */
-    .hero { position: relative; text-align: center; padding: 78px 0 30px; }
+    .hero { position: relative; text-align: center; padding: 36px 0 30px; }
     .app-mark {
-      width: 108px; height: 108px; border-radius: 26px; margin: 0 auto 30px; display: block;
-      box-shadow: 0 18px 60px rgba(124, 92, 255, 0.5), 0 0 0 1px rgba(255,255,255,0.06) inset;
+      width: 76px; height: 76px; border-radius: 20px; margin: 0 auto 18px; display: block;
+      box-shadow: 0 18px 48px rgba(24, 32, 31, 0.18), 0 0 0 1px rgba(255,255,255,0.7) inset;
       animation: bob 6s ease-in-out infinite;
     }
     @keyframes bob { 0%,100% { transform: translateY(0) rotate(-0.5deg); } 50% { transform: translateY(-12px) rotate(0.5deg); } }
 
     .eyebrow {
       display: inline-flex; align-items: center; gap: 8px;
-      font-size: 13px; font-weight: 600; letter-spacing: 0.02em; color: var(--violet);
-      background: rgba(124, 92, 255, 0.10); border: 1px solid var(--line-bright);
-      padding: 7px 15px; border-radius: 999px; margin-bottom: 26px;
+      font-size: 13px; font-weight: 600; letter-spacing: 0.02em; color: var(--violet-deep);
+      background: rgba(15, 118, 110, 0.08); border: 1px solid var(--line-bright);
+      padding: 7px 15px; border-radius: 999px; margin-bottom: 16px;
     }
-    .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--magenta); box-shadow: 0 0 10px var(--magenta); }
+    .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--violet); }
 
     .hero h1 {
       font-family: var(--display); font-weight: 500; font-optical-sizing: auto;
-      font-size: clamp(40px, 7vw, 78px); line-height: 1.02; letter-spacing: -0.025em;
-      margin: 0 auto 24px; max-width: 16ch;
+      font-size: clamp(38px, 6vw, 64px); line-height: 1.02; letter-spacing: 0;
+      margin: 0 auto 16px; max-width: 16ch;
     }
     .hero h1 em {
       font-style: italic; font-weight: 500;
-      background: linear-gradient(120deg, var(--violet) 0%, var(--magenta) 55%, var(--cyan) 120%);
+      background: linear-gradient(120deg, var(--violet-deep) 0%, var(--cyan) 100%);
       -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
     }
     .hero p.lead {
-      font-size: clamp(17px, 2.1vw, 20px); color: var(--dim); max-width: 60ch; margin: 0 auto 36px; font-weight: 400;
+      font-size: clamp(16px, 2vw, 19px); color: var(--dim); max-width: 60ch; margin: 0 auto 22px; font-weight: 400;
     }
 
     .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 22px; }
@@ -172,35 +140,27 @@
     }
     .btn svg { width: 18px; height: 18px; }
     .btn-primary {
-      color: #160a2e;
-      background: linear-gradient(135deg, #c9b6ff 0%, #a78bfa 40%, #d96cf6 100%);
-      box-shadow: 0 10px 34px rgba(167, 139, 250, 0.45), 0 0 0 1px rgba(255,255,255,0.18) inset;
+      color: #ffffff;
+      background: #17211f;
+      box-shadow: 0 12px 30px rgba(24, 32, 31, 0.22), 0 0 0 1px rgba(255,255,255,0.18) inset;
     }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 44px rgba(167, 139, 250, 0.62), 0 0 0 1px rgba(255,255,255,0.28) inset; }
+    .btn-primary:hover { transform: translateY(-2px); background: #0f766e; box-shadow: 0 16px 38px rgba(15, 118, 110, 0.24), 0 0 0 1px rgba(255,255,255,0.28) inset; }
     .btn-ghost { color: var(--ink); background: var(--glass); border: 1px solid var(--line-bright); }
-    .btn-ghost:hover { transform: translateY(-2px); background: var(--glass-2); box-shadow: 0 0 26px rgba(140, 96, 255, 0.3); }
+    .btn-ghost:hover { transform: translateY(-2px); background: var(--glass-2); box-shadow: 0 12px 30px rgba(24, 32, 31, 0.12); }
 
-    .hero .meta { font-size: 14px; color: var(--faint); letter-spacing: 0.01em; }
+    .hero .meta { font-size: 14px; color: var(--faint); letter-spacing: 0.01em; margin-top: 18px; }
     .hero .meta b { color: var(--dim); font-weight: 600; }
 
-    /* demo frame */
-    .demo-stage { margin-top: 56px; position: relative; }
-    .demo-glow {
+    /* app screenshots */
+    .screenshot-stage { margin-top: 24px; position: relative; }
+    .screenshot-glow {
       position: absolute; inset: -6% 14% auto 14%; height: 70%; z-index: -1; border-radius: 50%;
-      background: radial-gradient(ellipse at center, rgba(140, 96, 255, 0.45), transparent 70%); filter: blur(50px);
+      background: rgba(15, 118, 110, 0.08); filter: blur(44px);
     }
-    .demo-frame {
-      position: relative; max-width: 620px; margin: 0 auto; padding: 12px; border-radius: 26px;
-      background: var(--glass); border: 1px solid var(--line-bright);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset;
+    .screenshot-frame {
+      position: relative; max-width: 920px; margin: 0 auto;
     }
-    .demo-frame .titlebar { display: flex; gap: 7px; padding: 6px 10px 12px; }
-    .demo-frame .titlebar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
-    .demo-frame .titlebar i:nth-child(1) { background: #ff5f57; }
-    .demo-frame .titlebar i:nth-child(2) { background: #febc2e; }
-    .demo-frame .titlebar i:nth-child(3) { background: #28c840; }
-    .demo-frame img { width: 100%; display: block; border-radius: 16px; border: 1px solid var(--line); }
+    .screenshot-frame img { width: 100%; display: block; }
 
     /* ---------------- Section scaffolding ---------------- */
     section { padding: 96px 0; position: relative; }
@@ -226,21 +186,31 @@
     /* pointer-tracking spotlight */
     .card::before {
       content: ""; position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s; pointer-events: none;
-      background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), rgba(167, 139, 250, 0.16), transparent 60%);
+      background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), rgba(15, 118, 110, 0.10), transparent 60%);
     }
     .card:hover { transform: translateY(-4px); border-color: var(--line-bright); background: var(--glass-2); }
     .card:hover::before { opacity: 1; }
     .card .ic {
       width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; font-size: 22px;
-      margin-bottom: 18px; background: rgba(124, 92, 255, 0.12); border: 1px solid var(--line-bright);
-      box-shadow: 0 0 24px rgba(124, 92, 255, 0.22) inset;
+      margin-bottom: 18px; background: rgba(15, 118, 110, 0.08); border: 1px solid var(--line-bright);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.76);
     }
     .card h3 { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 8px; }
     .card p { font-size: 15px; color: var(--dim); line-height: 1.55; }
 
     .card.feat-actions { grid-column: span 3; }
     .card.feat-providers { grid-column: span 3; }
+    .workflow-panel {
+      display: grid; grid-template-columns: minmax(0, 0.82fr) minmax(360px, 1.18fr);
+      gap: 18px; margin-bottom: 16px;
+    }
+    .workflow-panel .card { min-height: 100%; }
+    .settings-showcase {
+      max-height: 480px; overflow: hidden;
+    }
+    .settings-showcase img { width: 100%; height: 100%; max-height: 452px; display: block; object-fit: cover; object-position: top center; }
     .card.wide-2 { grid-column: span 2; }
+    @media (max-width: 900px) { .workflow-panel { grid-template-columns: 1fr; } }
     @media (max-width: 860px) { .bento { grid-template-columns: repeat(2, 1fr); }
       .card.feat-actions, .card.feat-providers, .card.wide-2 { grid-column: span 2; } }
     @media (max-width: 540px) { .bento { grid-template-columns: 1fr; }
@@ -259,14 +229,13 @@
       font-size: 13.5px; font-weight: 600; padding: 6px 13px; border-radius: 999px; color: var(--dim);
       background: rgba(255,255,255,0.04); border: 1px solid var(--line);
     }
-
     /* ---------------- How it works ---------------- */
     .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
     .step { position: relative; padding: 30px 26px; border-radius: var(--radius);
       background: var(--glass); border: 1px solid var(--line); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
     .step .n {
       font-family: var(--display); font-size: 40px; font-weight: 500; line-height: 1;
-      background: linear-gradient(135deg, var(--violet), var(--magenta));
+      background: linear-gradient(135deg, var(--violet-deep), var(--cyan));
       -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px;
     }
     .step h3 { font-size: 19px; font-weight: 600; margin-bottom: 8px; }
@@ -284,34 +253,34 @@
     .install-card p { color: var(--dim); font-size: 15px; margin-bottom: 16px; }
     .install-card p:last-child { margin-bottom: 0; }
     .install-card a.inline { color: var(--violet); text-decoration: none; border-bottom: 1px solid var(--line-bright); }
-    .install-card a.inline:hover { color: var(--magenta); }
+    .install-card a.inline:hover { color: var(--cyan); }
 
     .term {
       display: flex; align-items: center; gap: 12px; justify-content: space-between;
-      font-family: var(--mono); font-size: 13px; color: #d8ccff;
-      background: rgba(0,0,0,0.4); border: 1px solid var(--line); border-radius: 12px; padding: 13px 14px;
+      font-family: var(--mono); font-size: 13px; color: #dce9e5;
+      background: #16211f; border: 1px solid rgba(24, 32, 31, 0.18); border-radius: 12px; padding: 13px 14px;
       margin: 14px 0; overflow-x: auto;
     }
     .term code { white-space: nowrap; }
     .term button {
-      flex: none; font-family: var(--body); font-size: 12.5px; font-weight: 600; color: var(--ink);
-      background: var(--glass-2); border: 1px solid var(--line-bright); border-radius: 8px;
+      flex: none; font-family: var(--body); font-size: 12.5px; font-weight: 600; color: #ffffff;
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22); border-radius: 8px;
       padding: 6px 12px; cursor: pointer; transition: all 0.2s;
     }
-    .term button:hover { background: rgba(167,139,250,0.22); }
+    .term button:hover { background: rgba(255,255,255,0.20); }
 
-    .dl-final { text-align: center; }
+    .dl-final { text-align: center; margin-top: 30px; }
     .dl-final .req { margin-top: 18px; font-size: 14px; color: var(--faint); }
     .dl-final .req b { color: var(--dim); }
 
     /* ---------------- Footer ---------------- */
     footer {
       border-top: 1px solid var(--line); padding: 50px 0 60px; margin-top: 40px;
-      background: linear-gradient(180deg, transparent, rgba(124, 92, 255, 0.05));
+      background: rgba(255,255,255,0.48);
     }
     .foot-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
     .foot-brand { display: flex; align-items: center; gap: 12px; }
-    .foot-brand img { width: 38px; height: 38px; border-radius: 10px; box-shadow: 0 0 20px rgba(140,96,255,0.4); }
+    .foot-brand img { width: 38px; height: 38px; border-radius: 10px; box-shadow: 0 10px 24px rgba(24,32,31,0.14); }
     .foot-brand .t { font-weight: 600; font-size: 17px; }
     .foot-brand .s { font-size: 13.5px; color: var(--faint); }
     .foot-links { display: flex; gap: 26px; }
@@ -350,8 +319,7 @@
       .cta-row { flex-direction: column; align-items: stretch; gap: 12px; }
       .btn { justify-content: center; width: 100%; padding: 15px 22px; }
 
-      .demo-stage { margin-top: 40px; }
-      .demo-frame { padding: 8px; border-radius: 20px; }
+      .screenshot-stage { margin-top: 40px; }
 
       /* cards: trim padding and gaps to reclaim width */
       .bento, .steps, .install-grid { gap: 12px; }
@@ -378,14 +346,7 @@
 </head>
 <body>
   <div class="atmosphere"></div>
-  <div class="bloom a"></div><div class="bloom b"></div><div class="bloom c"></div>
   <div class="grain"></div>
-  <div class="drift" aria-hidden="true">
-    <span>AI is changing the world.</span>
-    <span>人工智能正在改变世界。</span>
-    <span>La inteligencia transforma el futuro.</span>
-    <span>L'intelligence réinvente le langage.</span>
-  </div>
 
   <!-- NAV -->
   <header class="nav" id="nav">
@@ -396,7 +357,7 @@
       </a>
       <nav class="nav-links">
         <a href="#features">Features</a>
-        <a href="#how">How it works</a>
+        <a href="#how">Workflows</a>
         <a href="https://github.com/iuhoay/lumo" target="_blank" rel="noopener">GitHub</a>
         <a class="ghost-pill" href="#download">Download</a>
       </nav>
@@ -408,11 +369,11 @@
   <!-- HERO -->
   <section class="hero wrap">
     <img class="app-mark pop p1" src="assets/icon.png" alt="Lumo — translation app icon" />
-    <div class="pop p2"><span class="eyebrow"><span class="dot"></span> macOS menu-bar app · works with PopClip</span></div>
-    <h1 class="pop p3">Turn any selection into an <em>LLM action</em>.</h1>
+    <div class="pop p2"><span class="eyebrow"><span class="dot"></span> Native macOS app · optional PopClip integration</span></div>
+    <h1 class="pop p3">AI text work, one <em>keystroke</em> away.</h1>
     <p class="lead pop p4">
-      Lumo translates, polishes, and summarizes text right where you're reading it —
-      select, click, and watch the answer stream in. Bring your own API key; it never leaves your Mac.
+      Lumo translates, polishes, and summarizes text from the menu bar, a global shortcut,
+      the clipboard, or PopClip. Bring your own API key; provider settings stay on your Mac.
     </p>
     <div class="cta-row pop p5">
       <a class="btn btn-primary" href="https://github.com/iuhoay/lumo/releases/latest/download/Lumo.zip">
@@ -424,16 +385,13 @@
         View on GitHub
       </a>
     </div>
-    <p class="meta pop p6"><b>Free &amp; open source</b> · macOS 26+ · OpenAI · Claude · DeepSeek &amp; any OpenAI-compatible API</p>
-
-    <!-- DEMO -->
-    <div class="demo-stage pop p6">
-      <div class="demo-glow"></div>
-      <div class="demo-frame">
-        <div class="titlebar"><i></i><i></i><i></i></div>
-        <img src="assets/demo.gif" alt="Lumo translating an English sentence into Simplified Chinese, streaming the result token by token" loading="lazy" />
+    <div class="screenshot-stage pop p6">
+      <div class="screenshot-glow"></div>
+      <div class="screenshot-frame">
+        <img src="assets/app-window.webp" alt="Lumo translating a short English paragraph into Simplified Chinese in the native macOS app window" loading="eager" />
       </div>
     </div>
+    <p class="meta pop p6"><b>Free &amp; open source</b> · macOS 26+ · OpenAI · Claude · DeepSeek &amp; any OpenAI-compatible API</p>
   </section>
 
   <!-- FEATURES -->
@@ -442,29 +400,29 @@
       <div class="sec-head reveal">
         <div class="kicker">Features</div>
         <h2>Small footprint, serious reach.</h2>
-        <p>One menu-bar app does the heavy lifting — providers, streaming, history, and speech — so the trigger stays out of your way.</p>
+        <p>One menu-bar app does the heavy lifting — providers, streaming, history, and speech — while each entry point stays fast.</p>
       </div>
 
-      <div class="bento">
-        <div class="card feat-actions reveal">
+      <div class="workflow-panel">
+        <div class="card reveal">
           <div class="ic">✶</div>
-          <h3>Three actions, one selection</h3>
-          <p>Translate, polish, or summarize whatever you've highlighted — switch modes without re-selecting.</p>
+          <h3>Text actions, your provider</h3>
+          <p>Translate, polish, or summarize text from the app window, clipboard, shortcut flow, or selected text. Point Lumo at OpenAI, Claude, DeepSeek, local Ollama, or any OpenAI-compatible endpoint.</p>
           <div class="glyphs">
             <span>翻译<small>Translate</small></span>
             <span>润色<small>Polish</small></span>
             <span>总结<small>Summarize</small></span>
           </div>
-        </div>
-
-        <div class="card feat-providers reveal d1">
-          <div class="ic">🔌</div>
-          <h3>Your model, your key</h3>
-          <p>Point Lumo at any provider. The API key is stored locally and never lives in the extension.</p>
           <div class="providers">
             <span>OpenAI</span><span>Anthropic · Claude</span><span>DeepSeek</span><span>Ollama</span><span>OpenAI-compatible</span>
           </div>
         </div>
+        <div class="settings-showcase reveal d1">
+          <img src="assets/settings.webp" alt="Lumo settings showing OpenAI-compatible provider, masked API key, DeepSeek base URL, model, and translation language options" loading="lazy" />
+        </div>
+      </div>
+
+      <div class="bento">
 
         <div class="card wide-2 reveal">
           <div class="ic">⚡</div>
@@ -506,19 +464,19 @@
     <div class="wrap">
       <div class="sec-head reveal">
         <div class="kicker">How it works</div>
-        <h2>From selection to result in seconds.</h2>
-        <p>Lumo is two coupled parts: a thin PopClip trigger and a native app that does the thinking.</p>
+        <h2>Choose the entry point that fits.</h2>
+        <p>Lumo is useful as a standalone app first, with PopClip as an optional fast path for selected text.</p>
       </div>
       <div class="steps">
         <div class="step reveal">
           <div class="n">01</div>
-          <h3>Select any text</h3>
-          <p>Highlight a sentence, paragraph, or page in any app — Lumo works wherever PopClip does.</p>
+          <h3>Open Lumo</h3>
+          <p>Use the menu bar, assign a global shortcut, or open an empty window when you want to work from the clipboard.</p>
         </div>
         <div class="step reveal d1">
           <div class="n">02</div>
-          <h3>Click in the PopClip bar</h3>
-          <p>Tap <span class="cn">翻译</span>, <span class="cn">润色</span>, or <span class="cn">总结</span>. The text hands off to the app over a <code>lumo://</code> URL.</p>
+          <h3>Send text in</h3>
+          <p>Paste or type text directly, press <span class="cn">Tab</span> to use the clipboard, or tap <span class="cn">翻译</span>, <span class="cn">润色</span>, or <span class="cn">总结</span> from PopClip.</p>
         </div>
         <div class="step reveal d2">
           <div class="n">03</div>
@@ -535,14 +493,14 @@
       <div class="sec-head reveal">
         <div class="kicker">Get Lumo</div>
         <h2>Two steps and you're set.</h2>
-        <p>The app is ad-hoc signed, so there's one quarantine command the first time — after that it updates itself.</p>
+        <p>Install the app first. PopClip is optional; Sparkle handles updates after the first launch.</p>
       </div>
 
       <div class="install-grid">
         <div class="install-card reveal">
           <div class="tag">Step 1 — The app</div>
           <h3>Install Lumo.app</h3>
-          <p>Download the zip, unzip it, and move <b>Lumo.app</b> to <code>/Applications</code>. Clear the quarantine flag once:</p>
+          <p><a class="inline" href="https://github.com/iuhoay/lumo/releases/latest/download/Lumo.zip">Download Lumo.zip</a>, unzip it, and move <b>Lumo.app</b> to <code>/Applications</code>. Clear the quarantine flag once:</p>
           <div class="term">
             <code id="xattr-cmd">xattr -dr com.apple.quarantine /Applications/Lumo.app</code>
             <button id="copyBtn" type="button">Copy</button>
@@ -551,11 +509,17 @@
         </div>
 
         <div class="install-card reveal d1">
-          <div class="tag">Step 2 — The trigger</div>
-          <h3>Add the PopClip extension</h3>
-          <p>Grab <a class="inline" href="https://github.com/iuhoay/lumo/tree/main/Lumo.popclipext" target="_blank" rel="noopener">Lumo.popclipext</a> from the repo, double-click to install it into <a class="inline" href="https://pilotmoon.com/popclip/" target="_blank" rel="noopener">PopClip</a>, and enable it.</p>
-          <p>Open the app once from its menu-bar item and set your provider, model, and API key in <b>Settings</b>. That's it — select text and go.</p>
+          <div class="tag">Step 2 — Settings</div>
+          <h3>Configure your provider</h3>
+          <p>Open Lumo from the menu bar and set your provider, model, API key, translation languages, and optional global shortcut in <b>Settings</b>.</p>
+          <p>Use OpenAI, Claude, DeepSeek, local Ollama, or another OpenAI-compatible endpoint.</p>
         </div>
+      </div>
+
+      <div class="install-card reveal d2">
+        <div class="tag">Optional integration</div>
+        <h3>Add PopClip for selected text</h3>
+        <p>If you use <a class="inline" href="https://pilotmoon.com/popclip/" target="_blank" rel="noopener">PopClip</a>, install <a class="inline" href="https://github.com/iuhoay/lumo/tree/main/Lumo.popclipext" target="_blank" rel="noopener">Lumo.popclipext</a> to send selected text to Lumo in one click. The extension is only a trigger; Lumo.app still handles providers, streaming, history, and speech.</p>
       </div>
 
       <div class="dl-final reveal d2">
@@ -563,7 +527,7 @@
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.6l3.3-3.3 1.4 1.4-5.7 5.7-5.7-5.7 1.4-1.4 3.3 3.3V3h2zM5 19h14v2H5z"/></svg>
           Download Lumo.zip
         </a>
-        <p class="req"><b>Requirements:</b> macOS 26.0+ · PopClip · an API key for your chosen LLM provider</p>
+        <p class="req"><b>Requirements:</b> macOS 26.0+ · an API key for your chosen LLM provider · PopClip optional</p>
       </div>
     </div>
   </section>
