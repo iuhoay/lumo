@@ -1,0 +1,55 @@
+name: Bug report
+description: Report something that is not working in Lumo.
+title: "Bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Please include enough detail to reproduce it.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the behavior you saw and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the exact steps, input text, and action used.
+      placeholder: |
+        1. Open Lumo...
+        2. Choose provider...
+        3. Run translate...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Lumo version
+      placeholder: "0.1.7"
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version
+      placeholder: "macOS 26.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Provider
+      options:
+        - OpenAI
+        - Anthropic
+        - OpenAI-compatible
+        - Not provider-related
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional context
+      description: Add screenshots, logs, or notes. Do not paste API keys or secrets.
