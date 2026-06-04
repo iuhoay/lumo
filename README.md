@@ -26,11 +26,11 @@ aloud.
 ## Demo
 
 <p align="center">
-  <img src="assets/demo.gif" alt="Lumo translating an English sentence into Simplified Chinese, with the result streaming in" width="70%">
+  <img src="docs/assets/app-window.webp" alt="Lumo translating a short English paragraph into Simplified Chinese in the native macOS app window" width="80%">
 </p>
 
-The demo shows the PopClip workflow. Lumo can also be opened directly from the
-menu bar, a global shortcut, or the clipboard.
+Lumo can be opened directly from the menu bar, a global shortcut, the clipboard,
+or an optional PopClip action.
 
 ## Features
 
