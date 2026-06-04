@@ -1,0 +1,24 @@
+#!/bin/sh
+
+payload=$(cat)
+file_path=$(printf '%s' "$payload" | jq -r '.tool_input.file_path // empty' 2>/dev/null || true)
+
+[ -n "$file_path" ] || exit 0
+
+case "$file_path" in
+  */mac-app/project.yml|mac-app/project.yml)
+    if command -v xcodegen >/dev/null 2>&1; then
+      ( cd "$(dirname "$file_path")" && xcodegen generate )
+    fi
+    ;;
+esac
+
+case "$file_path" in
+  *.swift)
+    if command -v swiftformat >/dev/null 2>&1; then
+      swiftformat "$file_path"
+    fi
+    ;;
+esac
+
+exit 0
