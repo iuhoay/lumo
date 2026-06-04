@@ -54,8 +54,10 @@ There are no automated tests.
 ## Releasing
 
 CI (`.github/workflows/release.yml`) builds, EdDSA-signs, generates
-`appcast.xml`, and publishes the GitHub Release **on push of a `v*` tag**.
-Before tagging:
+`appcast.xml`, and publishes the GitHub Release **on push of a `v*` tag**. The
+actual logic lives in **`bin/release`** (`build` / `appcast` / `publish`
+subcommands); the workflow just calls each one. Edit `bin/release`, not the
+inline YAML, and shellcheck it. Before tagging:
 
 1. Bump the version in **both** places in `mac-app/project.yml`:
    `MARKETING_VERSION` and `info.properties.CFBundleShortVersionString`.
