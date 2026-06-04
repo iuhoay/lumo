@@ -1,24 +1,27 @@
 <p align="center">
-  <img src="assets/banner.png" alt="Lumo — translate, polish, and summarize selected text on macOS" width="100%">
+  <img src="assets/banner.png" alt="Lumo — a macOS text assistant for translating, polishing, and summarizing" width="100%">
 </p>
 
-# Lumo
+# Lumo for macOS
 
-Translate, polish, and summarize any selected text on macOS with an LLM —
-triggered straight from [PopClip](https://pilotmoon.com/popclip/).
+Translate, polish, and summarize text anywhere on macOS with your own LLM
+provider.
 
-Lumo is a two-component system:
+Lumo is a lightweight menu-bar app for everyday text work. Open it with a global
+shortcut, paste from the clipboard, or trigger it from
+[PopClip](https://pilotmoon.com/popclip/) when you select text in another app.
+Results stream into a native macOS window, stay in history, and can be read
+aloud.
 
-1. **PopClip extension** (`Lumo.popclipext/`) — a thin trigger. When you select
-   text and click an action, it hands the text to the native app via a custom
-   `lumo://` URL scheme. It contains no LLM logic itself.
-2. **Native macOS app** (`mac-app/`) — a menu-bar app that does the real work:
-   talks to the LLM provider, streams the result, shows it in a window, keeps a
-   history, and can read it aloud.
+## What you can do
 
-This split exists because PopClip's JavaScript sandbox can't open a real,
-persistent window or make arbitrary network calls comfortably — so the
-extension delegates everything to the app.
+- **Translate, polish, and summarize** text without opening a chat app.
+- **Start from anywhere** with the menu bar, a global shortcut, the clipboard,
+  or an optional PopClip action.
+- **Bring your own provider**: OpenAI, Anthropic (Claude), or any
+  OpenAI-compatible endpoint such as DeepSeek or local Ollama.
+- **Keep the workflow native** with streaming output, history, text-to-speech,
+  and a menu-bar app that stays out of the Dock.
 
 ## Demo
 
@@ -26,10 +29,15 @@ extension delegates everything to the app.
   <img src="assets/demo.gif" alt="Lumo translating an English sentence into Simplified Chinese, with the result streaming in" width="70%">
 </p>
 
+The demo shows the PopClip workflow. Lumo can also be opened directly from the
+menu bar, a global shortcut, or the clipboard.
+
 ## Features
 
-- **Three actions** on any selection: 翻译 (translate), 润色 (polish),
-  总结 (summarize).
+- **Three text actions**: translate, polish, and summarize.
+- **Multiple ways to start**: menu bar, a configurable global shortcut, an empty
+  window that can paste and translate the clipboard with one keystroke, or
+  PopClip selection actions.
 - **Multiple providers**: OpenAI, Anthropic (Claude), and any
   OpenAI-compatible endpoint (DeepSeek, local Ollama, etc.).
 - **Streaming output** via Server-Sent Events — results appear token by token.
@@ -42,27 +50,16 @@ extension delegates everything to the app.
   in the background (and on demand from the menu bar) and installs new versions in
   place, so the one-time quarantine clear below never has to be repeated.
 
-## Repository layout
-
-```
-Lumo.popclipext/       PopClip extension (trigger only)
-  Config.json          Extension manifest + the "App URL Scheme" option
-  translate.js         Builds the lumo:// URL for each action
-mac-app/               Native macOS app (Swift, SwiftUI + AppKit)
-  project.yml          XcodeGen project spec
-  Lumo/                App sources (models, services, views, URL routing)
-```
-
 ## Requirements
 
 - macOS 26.0 or later (the app adopts the Liquid Glass design)
-- [PopClip](https://pilotmoon.com/popclip/)
-- [XcodeGen](https://github.com/yonaskolb/XcodeGen) and Xcode 26 or later (to build the app)
 - An API key for your chosen LLM provider
+- Optional: [PopClip](https://pilotmoon.com/popclip/) for selection-based
+  actions
 
 ## Install
 
-### 1. Install the macOS app
+### Install the macOS app
 
 Download [**Lumo.zip**](https://github.com/iuhoay/lumo/releases/latest/download/Lumo.zip),
 unzip it, and move `Lumo.app` to `/Applications`. The app is unsigned, so clear
@@ -80,27 +77,6 @@ can trigger a check yourself from the menu bar via **检查更新…**. Updates 
 verified by signature and installed in place without re-triggering quarantine —
 so you only ever run the `xattr` command this one time.
 
-<details>
-<summary>Or build it yourself from source</summary>
-
-The Xcode project is generated from `project.yml` (it is not committed). From
-`mac-app/`:
-
-```sh
-brew install xcodegen        # if you don't have it
-cd mac-app
-xcodegen generate            # creates Lumo.xcodeproj
-open Lumo.xcodeproj          # then build & run the "Lumo" scheme in Xcode
-```
-
-</details>
-
-### 2. Install the PopClip extension
-
-Get [`Lumo.popclipext`](https://github.com/iuhoay/lumo/tree/main/Lumo.popclipext)
-from this repo (clone or download the repo), then double-click it to install it
-into PopClip and enable it in PopClip's preferences.
-
 ## Configure
 
 Open the app from its menu-bar item and set, in **Settings**:
@@ -113,6 +89,7 @@ Open the app from its menu-bar item and set, in **Settings**:
 | API key           | Stored per provider                                              |
 | Target (from 中文) | Language to translate **into** when the input is Chinese         |
 | Target (other)    | Language to translate **into** when the input is not Chinese     |
+| Shortcut          | Optional global hotkey for opening a new translation window      |
 
 > **Note on the API key:** because the app is unsigned, it stores the API key in
 > its own `UserDefaults` (plaintext) rather than the Keychain — an unsigned
@@ -123,10 +100,56 @@ Open the app from its menu-bar item and set, in **Settings**:
 
 ## Use
 
-Select text anywhere, then click **翻译**, **润色**, or **总结** in the PopClip
-bar. The app opens with the streamed result, which is also added to history.
+Use Lumo in whichever way fits the text you are working with:
 
-## Dev vs. production builds
+- **From the menu bar**: open a new translation window, paste or type text, then
+  run translate, polish, or summarize.
+- **From a global shortcut**: assign a shortcut in Settings and open Lumo from
+  any app.
+- **From the clipboard**: open an empty translation window and press <kbd>Tab</kbd>
+  when the clipboard contains text.
+- **From PopClip**: select text anywhere, then click **翻译**, **润色**, or
+  **总结** in the PopClip bar.
+
+The result streams into the window and is saved to history.
+
+## Optional integrations
+
+### PopClip
+
+If you use [PopClip](https://pilotmoon.com/popclip/), install
+[`Lumo.popclipext`](https://github.com/iuhoay/lumo/tree/main/Lumo.popclipext)
+to send selected text to Lumo in one click. The extension is only a trigger; the
+native app still handles the provider, API key, model, streaming result, and
+history.
+
+## Development
+
+### Repository layout
+
+```
+Lumo.popclipext/       PopClip extension (trigger only)
+  Config.json          Extension manifest + the "App URL Scheme" option
+  translate.js         Builds the lumo:// URL for each action
+mac-app/               Native macOS app (Swift, SwiftUI + AppKit)
+  project.yml          XcodeGen project spec
+  Lumo/                App sources (models, services, views, URL routing)
+```
+
+### Build from source
+
+Building from source requires [XcodeGen](https://github.com/yonaskolb/XcodeGen)
+and Xcode 26 or later. The Xcode project is generated from `project.yml` (it is
+not committed). From `mac-app/`:
+
+```sh
+brew install xcodegen        # if you don't have it
+cd mac-app
+xcodegen generate            # creates Lumo.xcodeproj
+open Lumo.xcodeproj          # then build & run the "Lumo" scheme in Xcode
+```
+
+### Dev vs. production builds
 
 The project defines two coexisting build configurations so a dev build doesn't
 clobber the release one:
