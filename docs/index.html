@@ -102,9 +102,9 @@
     @media (max-width: 720px) { .nav-links a:not(.ghost-pill) { display: none; } }
 
     /* ---------------- Hero ---------------- */
-    .hero { position: relative; text-align: center; padding: 78px 0 30px; }
+    .hero { position: relative; text-align: center; padding: 36px 0 30px; }
     .app-mark {
-      width: 108px; height: 108px; border-radius: 26px; margin: 0 auto 30px; display: block;
+      width: 76px; height: 76px; border-radius: 20px; margin: 0 auto 18px; display: block;
       box-shadow: 0 18px 48px rgba(24, 32, 31, 0.18), 0 0 0 1px rgba(255,255,255,0.7) inset;
       animation: bob 6s ease-in-out infinite;
     }
@@ -114,14 +114,14 @@
       display: inline-flex; align-items: center; gap: 8px;
       font-size: 13px; font-weight: 600; letter-spacing: 0.02em; color: var(--violet-deep);
       background: rgba(15, 118, 110, 0.08); border: 1px solid var(--line-bright);
-      padding: 7px 15px; border-radius: 999px; margin-bottom: 26px;
+      padding: 7px 15px; border-radius: 999px; margin-bottom: 16px;
     }
     .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--violet); }
 
     .hero h1 {
       font-family: var(--display); font-weight: 500; font-optical-sizing: auto;
-      font-size: clamp(40px, 7vw, 78px); line-height: 1.02; letter-spacing: 0;
-      margin: 0 auto 24px; max-width: 16ch;
+      font-size: clamp(38px, 6vw, 64px); line-height: 1.02; letter-spacing: 0;
+      margin: 0 auto 16px; max-width: 16ch;
     }
     .hero h1 em {
       font-style: italic; font-weight: 500;
@@ -129,7 +129,7 @@
       -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
     }
     .hero p.lead {
-      font-size: clamp(17px, 2.1vw, 20px); color: var(--dim); max-width: 60ch; margin: 0 auto 36px; font-weight: 400;
+      font-size: clamp(16px, 2vw, 19px); color: var(--dim); max-width: 60ch; margin: 0 auto 22px; font-weight: 400;
     }
 
     .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 22px; }
@@ -148,27 +148,19 @@
     .btn-ghost { color: var(--ink); background: var(--glass); border: 1px solid var(--line-bright); }
     .btn-ghost:hover { transform: translateY(-2px); background: var(--glass-2); box-shadow: 0 12px 30px rgba(24, 32, 31, 0.12); }
 
-    .hero .meta { font-size: 14px; color: var(--faint); letter-spacing: 0.01em; }
+    .hero .meta { font-size: 14px; color: var(--faint); letter-spacing: 0.01em; margin-top: 18px; }
     .hero .meta b { color: var(--dim); font-weight: 600; }
 
-    /* demo frame */
-    .demo-stage { margin-top: 56px; position: relative; }
-    .demo-glow {
+    /* app screenshots */
+    .screenshot-stage { margin-top: 24px; position: relative; }
+    .screenshot-glow {
       position: absolute; inset: -6% 14% auto 14%; height: 70%; z-index: -1; border-radius: 50%;
       background: rgba(15, 118, 110, 0.08); filter: blur(44px);
     }
-    .demo-frame {
-      position: relative; max-width: 620px; margin: 0 auto; padding: 12px; border-radius: 26px;
-      background: var(--glass); border: 1px solid var(--line-bright);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      box-shadow: 0 34px 80px rgba(24, 32, 31, 0.18), 0 0 0 1px rgba(255,255,255,0.9) inset;
+    .screenshot-frame {
+      position: relative; max-width: 920px; margin: 0 auto;
     }
-    .demo-frame .titlebar { display: flex; gap: 7px; padding: 6px 10px 12px; }
-    .demo-frame .titlebar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
-    .demo-frame .titlebar i:nth-child(1) { background: #ff5f57; }
-    .demo-frame .titlebar i:nth-child(2) { background: #febc2e; }
-    .demo-frame .titlebar i:nth-child(3) { background: #28c840; }
-    .demo-frame img { width: 100%; display: block; border-radius: 16px; border: 1px solid var(--line); }
+    .screenshot-frame img { width: 100%; display: block; }
 
     /* ---------------- Section scaffolding ---------------- */
     section { padding: 96px 0; position: relative; }
@@ -208,7 +200,17 @@
 
     .card.feat-actions { grid-column: span 3; }
     .card.feat-providers { grid-column: span 3; }
+    .workflow-panel {
+      display: grid; grid-template-columns: minmax(0, 0.82fr) minmax(360px, 1.18fr);
+      gap: 18px; margin-bottom: 16px;
+    }
+    .workflow-panel .card { min-height: 100%; }
+    .settings-showcase {
+      max-height: 480px; overflow: hidden;
+    }
+    .settings-showcase img { width: 100%; height: 100%; max-height: 452px; display: block; object-fit: cover; object-position: top center; }
     .card.wide-2 { grid-column: span 2; }
+    @media (max-width: 900px) { .workflow-panel { grid-template-columns: 1fr; } }
     @media (max-width: 860px) { .bento { grid-template-columns: repeat(2, 1fr); }
       .card.feat-actions, .card.feat-providers, .card.wide-2 { grid-column: span 2; } }
     @media (max-width: 540px) { .bento { grid-template-columns: 1fr; }
@@ -227,7 +229,6 @@
       font-size: 13.5px; font-weight: 600; padding: 6px 13px; border-radius: 999px; color: var(--dim);
       background: rgba(255,255,255,0.04); border: 1px solid var(--line);
     }
-
     /* ---------------- How it works ---------------- */
     .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
     .step { position: relative; padding: 30px 26px; border-radius: var(--radius);
@@ -318,8 +319,7 @@
       .cta-row { flex-direction: column; align-items: stretch; gap: 12px; }
       .btn { justify-content: center; width: 100%; padding: 15px 22px; }
 
-      .demo-stage { margin-top: 40px; }
-      .demo-frame { padding: 8px; border-radius: 20px; }
+      .screenshot-stage { margin-top: 40px; }
 
       /* cards: trim padding and gaps to reclaim width */
       .bento, .steps, .install-grid { gap: 12px; }
@@ -385,16 +385,13 @@
         View on GitHub
       </a>
     </div>
-    <p class="meta pop p6"><b>Free &amp; open source</b> · macOS 26+ · OpenAI · Claude · DeepSeek &amp; any OpenAI-compatible API</p>
-
-    <!-- DEMO -->
-    <div class="demo-stage pop p6">
-      <div class="demo-glow"></div>
-      <div class="demo-frame">
-        <div class="titlebar"><i></i><i></i><i></i></div>
-        <img src="assets/demo.gif" alt="Lumo translating an English sentence into Simplified Chinese, streaming the result token by token" loading="lazy" />
+    <div class="screenshot-stage pop p6">
+      <div class="screenshot-glow"></div>
+      <div class="screenshot-frame">
+        <img src="assets/app-window.webp" alt="Lumo translating a short English paragraph into Simplified Chinese in the native macOS app window" loading="eager" />
       </div>
     </div>
+    <p class="meta pop p6"><b>Free &amp; open source</b> · macOS 26+ · OpenAI · Claude · DeepSeek &amp; any OpenAI-compatible API</p>
   </section>
 
   <!-- FEATURES -->
@@ -406,26 +403,26 @@
         <p>One menu-bar app does the heavy lifting — providers, streaming, history, and speech — while each entry point stays fast.</p>
       </div>
 
-      <div class="bento">
-        <div class="card feat-actions reveal">
+      <div class="workflow-panel">
+        <div class="card reveal">
           <div class="ic">✶</div>
-          <h3>Three text actions</h3>
-          <p>Translate, polish, or summarize text from the app window, clipboard, shortcut flow, or selected text.</p>
+          <h3>Text actions, your provider</h3>
+          <p>Translate, polish, or summarize text from the app window, clipboard, shortcut flow, or selected text. Point Lumo at OpenAI, Claude, DeepSeek, local Ollama, or any OpenAI-compatible endpoint.</p>
           <div class="glyphs">
             <span>翻译<small>Translate</small></span>
             <span>润色<small>Polish</small></span>
             <span>总结<small>Summarize</small></span>
           </div>
-        </div>
-
-        <div class="card feat-providers reveal d1">
-          <div class="ic">🔌</div>
-          <h3>Your model, your key</h3>
-          <p>Point Lumo at any provider. API keys and model settings are configured in the native app.</p>
           <div class="providers">
             <span>OpenAI</span><span>Anthropic · Claude</span><span>DeepSeek</span><span>Ollama</span><span>OpenAI-compatible</span>
           </div>
         </div>
+        <div class="settings-showcase reveal d1">
+          <img src="assets/settings.webp" alt="Lumo settings showing OpenAI-compatible provider, masked API key, DeepSeek base URL, model, and translation language options" loading="lazy" />
+        </div>
+      </div>
+
+      <div class="bento">
 
         <div class="card wide-2 reveal">
           <div class="ic">⚡</div>
