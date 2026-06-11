@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- "Apple (On-Device)" provider powered by Apple's Foundation Models framework:
+  runs the system language model entirely on-device with no API key, network,
+  or cost. Requires an Apple Intelligence–capable Mac on macOS 26+; Settings
+  shows a live readiness status and a clear message when the model is
+  unavailable.
+
 ## [0.1.7] - 2026-06-02
 
 ### Added

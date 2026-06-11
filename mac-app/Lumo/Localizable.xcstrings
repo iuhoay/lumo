@@ -450,6 +450,56 @@
           }
         }
       }
+    },
+    "Apple Intelligence is turned off. Enable it in System Settings to use the on-device model." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence 已关闭。请在“系统设置”中开启后再使用设备端模型。"
+          }
+        }
+      }
+    },
+    "On-device model ready. No API key needed." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设备端模型已就绪，无需 API Key。"
+          }
+        }
+      }
+    },
+    "The on-device model is still downloading. Try again in a little while." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设备端模型仍在下载，请稍后再试。"
+          }
+        }
+      }
+    },
+    "The on-device model isn't available right now." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设备端模型当前不可用。"
+          }
+        }
+      }
+    },
+    "This Mac doesn't support Apple Intelligence, so the on-device model is unavailable." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此 Mac 不支持 Apple Intelligence，设备端模型不可用。"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
