@@ -15,6 +15,7 @@ enum TranslationError: LocalizedError {
     case http(status: Int, body: String)
     case invalidResponse
     case network(String)
+    case localModelUnavailable(String)
 
     var errorDescription: String? {
         switch self {
@@ -22,6 +23,8 @@ enum TranslationError: LocalizedError {
             return String(localized: "No API key set. Add one in Settings.")
         case .invalidBaseURL:
             return String(localized: "Invalid Base URL. Check Settings.")
+        case .localModelUnavailable(let message):
+            return message
         case .http(let status, let body):
             let detail = Self.friendlyBody(body)
             return "\(String(localized: "Request failed")) (HTTP \(status)): \(detail)"
@@ -50,7 +53,11 @@ protocol TranslationService {
 
 enum ServiceFactory {
     static func make(for provider: Provider) -> TranslationService {
-        provider == .anthropic ? AnthropicService() : OpenAICompatibleService()
+        switch provider {
+        case .anthropic: return AnthropicService()
+        case .appleFoundation: return AppleFoundationModelService()
+        default: return OpenAICompatibleService()
+        }
     }
 }
 

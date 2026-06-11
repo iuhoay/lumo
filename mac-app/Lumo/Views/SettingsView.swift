@@ -20,15 +20,21 @@ struct SettingsView: View {
                     apiKey = settings.apiKey(for: newValue)
                 }
 
-                SecureField("API Key", text: $apiKey)
-                    .onChange(of: apiKey) { _, newValue in
-                        settings.setAPIKey(newValue, for: settings.provider)
-                    }
+                if settings.provider.isOnDevice {
+                    // On-device: no key, base URL, or model to configure — just
+                    // surface whether the model is ready to run on this Mac.
+                    onDeviceStatusRow()
+                } else {
+                    SecureField("API Key", text: $apiKey)
+                        .onChange(of: apiKey) { _, newValue in
+                            settings.setAPIKey(newValue, for: settings.provider)
+                        }
 
-                TextField("Base URL", text: $settings.baseURL,
-                          prompt: Text(settings.provider.defaultBaseURL))
-                TextField("Model", text: $settings.model,
-                          prompt: Text("deepseek-v4-flash"))
+                    TextField("Base URL", text: $settings.baseURL,
+                              prompt: Text(settings.provider.defaultBaseURL))
+                    TextField("Model", text: $settings.model,
+                              prompt: Text("deepseek-v4-flash"))
+                }
             }
 
             Section("Language (translate mode)") {
@@ -49,5 +55,14 @@ struct SettingsView: View {
         .onAppear {
             apiKey = settings.apiKey(for: settings.provider)
         }
+    }
+
+    /// Live readiness of the on-device Apple model (queried each render — cheap).
+    @ViewBuilder
+    private func onDeviceStatusRow() -> some View {
+        let status = AppleFoundationModelService.availabilityStatus()
+        Label(status.message, systemImage: status.ok ? "checkmark.circle" : "exclamationmark.triangle")
+            .foregroundStyle(status.ok ? Color.green : Color.orange)
+            .font(.callout)
     }
 }

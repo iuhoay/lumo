@@ -105,10 +105,13 @@ final class AppModel: ObservableObject {
             otherwise: settings.targetWhenOther
         )
         resolvedTarget = target
+        // The on-device provider has no configurable model name; label it so
+        // history doesn't show an unrelated, unused cloud model string.
+        let modelName = settings.provider.isOnDevice ? "Apple On-Device" : settings.model
         let chat = ChatRequest(
             baseURL: settings.resolvedBaseURL(for: settings.provider),
             apiKey: settings.apiKey(for: settings.provider),
-            model: settings.model,
+            model: modelName,
             system: mode.systemPrompt(target: target),
             user: text
         )
@@ -129,7 +132,7 @@ final class AppModel: ObservableObject {
                         outputText: finalOutput,
                         target: target,
                         provider: settings.provider,
-                        model: settings.model
+                        model: modelName
                     ))
                 }
             } catch {
