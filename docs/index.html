@@ -14,7 +14,7 @@
   <meta name="twitter:card" content="summary_large_image" />
 
   <link rel="icon" type="image/png" href="assets/icon.png" />
-  <link rel="apple-touch-icon" href="assets/icon.png" />
+  <link rel="apple-touch-icon" href="assets/app-icon.png" />
 
   <!-- Fonts: Fraunces (luminous editorial serif, display) + Hanken Grotesk (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -23,20 +23,20 @@
 
   <style>
     :root {
-      --bg-0: #f7f8f6;
-      --bg-1: #eef3f1;
-      --violet: #0f766e;
-      --violet-deep: #115e59;
-      --magenta: #c9782d;
-      --blue: #2563eb;
-      --cyan: #0891b2;
-      --ink: #18201f;
-      --dim: rgba(24, 32, 31, 0.68);
-      --faint: rgba(24, 32, 31, 0.42);
+      --bg-0: #f5fbff;
+      --bg-1: #e9f6ff;
+      --violet: #188ff2;
+      --violet-deep: #0b6fd3;
+      --magenta: #54d8ff;
+      --blue: #1a9cff;
+      --cyan: #64f4ee;
+      --ink: #102033;
+      --dim: rgba(16, 32, 51, 0.68);
+      --faint: rgba(16, 32, 51, 0.42);
       --glass: rgba(255, 255, 255, 0.72);
       --glass-2: rgba(255, 255, 255, 0.92);
-      --line: rgba(28, 43, 40, 0.12);
-      --line-bright: rgba(15, 118, 110, 0.28);
+      --line: rgba(16, 64, 112, 0.12);
+      --line-bright: rgba(24, 143, 242, 0.30);
       --display: "Fraunces", "Iowan Old Style", Georgia, serif;
       --body: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
       --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
@@ -64,10 +64,12 @@
       inset: 0;
       z-index: -2;
       background:
-        linear-gradient(rgba(24, 32, 31, 0.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(24, 32, 31, 0.035) 1px, transparent 1px),
-        linear-gradient(180deg, #ffffff 0%, var(--bg-0) 42%, var(--bg-1) 100%);
-      background-size: 42px 42px, 42px 42px, auto;
+        radial-gradient(760px circle at 50% 8%, rgba(26, 156, 255, 0.10), transparent 48%),
+        radial-gradient(520px circle at 76% 24%, rgba(100, 244, 238, 0.14), transparent 48%),
+        linear-gradient(rgba(16, 64, 112, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16, 64, 112, 0.045) 1px, transparent 1px),
+        linear-gradient(180deg, #ffffff 0%, var(--bg-0) 44%, var(--bg-1) 100%);
+      background-size: auto, auto, 42px 42px, 42px 42px, auto;
     }
     /* fine grain overlay for premium depth */
     .grain {
@@ -83,14 +85,14 @@
       position: sticky; top: 0; z-index: 50;
       backdrop-filter: blur(18px) saturate(150%);
       -webkit-backdrop-filter: blur(18px) saturate(150%);
-      background: rgba(247, 248, 246, 0.78);
+      background: rgba(245, 251, 255, 0.78);
       border-bottom: 1px solid transparent;
       transition: border-color 0.4s ease, background 0.4s ease;
     }
     header.nav.scrolled { border-bottom-color: var(--line); background: rgba(255, 255, 255, 0.88); }
     .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 66px; }
     .brand { display: flex; align-items: center; gap: 11px; font-weight: 600; font-size: 19px; letter-spacing: 0; }
-    .brand img { width: 30px; height: 30px; border-radius: 8px; box-shadow: 0 8px 24px rgba(24, 32, 31, 0.16); }
+    .brand img { width: 30px; height: 30px; border-radius: 8px; box-shadow: 0 8px 24px rgba(24, 143, 242, 0.22); }
     .nav-links { display: flex; align-items: center; gap: 28px; }
     .nav-links a { color: var(--dim); text-decoration: none; font-size: 15px; font-weight: 500; transition: color 0.2s; }
     .nav-links a:hover { color: var(--ink); }
@@ -98,22 +100,15 @@
       color: var(--ink); border: 1px solid var(--line-bright); padding: 8px 18px; border-radius: 999px;
       background: var(--glass); transition: all 0.25s;
     }
-    .nav-links .ghost-pill:hover { background: var(--glass-2); box-shadow: 0 10px 26px rgba(15, 118, 110, 0.16); }
+    .nav-links .ghost-pill:hover { background: var(--glass-2); box-shadow: 0 10px 26px rgba(24, 143, 242, 0.18); }
     @media (max-width: 720px) { .nav-links a:not(.ghost-pill) { display: none; } }
 
     /* ---------------- Hero ---------------- */
     .hero { position: relative; text-align: center; padding: 36px 0 30px; }
-    .app-mark {
-      width: 76px; height: 76px; border-radius: 20px; margin: 0 auto 18px; display: block;
-      box-shadow: 0 18px 48px rgba(24, 32, 31, 0.18), 0 0 0 1px rgba(255,255,255,0.7) inset;
-      animation: bob 6s ease-in-out infinite;
-    }
-    @keyframes bob { 0%,100% { transform: translateY(0) rotate(-0.5deg); } 50% { transform: translateY(-12px) rotate(0.5deg); } }
-
     .eyebrow {
       display: inline-flex; align-items: center; gap: 8px;
       font-size: 13px; font-weight: 600; letter-spacing: 0.02em; color: var(--violet-deep);
-      background: rgba(15, 118, 110, 0.08); border: 1px solid var(--line-bright);
+      background: rgba(24, 143, 242, 0.08); border: 1px solid var(--line-bright);
       padding: 7px 15px; border-radius: 999px; margin-bottom: 16px;
     }
     .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--violet); }
@@ -141,12 +136,12 @@
     .btn svg { width: 18px; height: 18px; }
     .btn-primary {
       color: #ffffff;
-      background: #17211f;
-      box-shadow: 0 12px 30px rgba(24, 32, 31, 0.22), 0 0 0 1px rgba(255,255,255,0.18) inset;
+      background: linear-gradient(135deg, #0b7fe8 0%, #1a9cff 58%, #42d6ff 100%);
+      box-shadow: 0 14px 34px rgba(24, 143, 242, 0.26), 0 0 0 1px rgba(255,255,255,0.32) inset;
     }
-    .btn-primary:hover { transform: translateY(-2px); background: #0f766e; box-shadow: 0 16px 38px rgba(15, 118, 110, 0.24), 0 0 0 1px rgba(255,255,255,0.28) inset; }
+    .btn-primary:hover { transform: translateY(-2px); background: linear-gradient(135deg, #0872d0 0%, #168cf0 56%, #64f4ee 100%); box-shadow: 0 16px 38px rgba(24, 143, 242, 0.32), 0 0 0 1px rgba(255,255,255,0.36) inset; }
     .btn-ghost { color: var(--ink); background: var(--glass); border: 1px solid var(--line-bright); }
-    .btn-ghost:hover { transform: translateY(-2px); background: var(--glass-2); box-shadow: 0 12px 30px rgba(24, 32, 31, 0.12); }
+    .btn-ghost:hover { transform: translateY(-2px); background: var(--glass-2); box-shadow: 0 12px 30px rgba(24, 143, 242, 0.14); }
 
     .hero .meta { font-size: 14px; color: var(--faint); letter-spacing: 0.01em; margin-top: 18px; }
     .hero .meta b { color: var(--dim); font-weight: 600; }
@@ -155,7 +150,7 @@
     .screenshot-stage { margin-top: 24px; position: relative; }
     .screenshot-glow {
       position: absolute; inset: -6% 14% auto 14%; height: 70%; z-index: -1; border-radius: 50%;
-      background: rgba(15, 118, 110, 0.08); filter: blur(44px);
+      background: linear-gradient(135deg, rgba(26, 156, 255, 0.13), rgba(100, 244, 238, 0.10)); filter: blur(44px);
     }
     .screenshot-frame {
       position: relative; max-width: 920px; margin: 0 auto;
@@ -186,13 +181,13 @@
     /* pointer-tracking spotlight */
     .card::before {
       content: ""; position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s; pointer-events: none;
-      background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), rgba(15, 118, 110, 0.10), transparent 60%);
+      background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), rgba(26, 156, 255, 0.11), transparent 60%);
     }
     .card:hover { transform: translateY(-4px); border-color: var(--line-bright); background: var(--glass-2); }
     .card:hover::before { opacity: 1; }
     .card .ic {
       width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; font-size: 22px;
-      margin-bottom: 18px; background: rgba(15, 118, 110, 0.08); border: 1px solid var(--line-bright);
+      margin-bottom: 18px; background: rgba(24, 143, 242, 0.08); border: 1px solid var(--line-bright);
       box-shadow: inset 0 0 0 1px rgba(255,255,255,0.76);
     }
     .card h3 { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 8px; }
@@ -257,8 +252,8 @@
 
     .term {
       display: flex; align-items: center; gap: 12px; justify-content: space-between;
-      font-family: var(--mono); font-size: 13px; color: #dce9e5;
-      background: #16211f; border: 1px solid rgba(24, 32, 31, 0.18); border-radius: 12px; padding: 13px 14px;
+      font-family: var(--mono); font-size: 13px; color: #dbeeff;
+      background: #102033; border: 1px solid rgba(16, 64, 112, 0.20); border-radius: 12px; padding: 13px 14px;
       margin: 14px 0; overflow-x: auto;
     }
     .term code { white-space: nowrap; }
@@ -280,7 +275,7 @@
     }
     .foot-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
     .foot-brand { display: flex; align-items: center; gap: 12px; }
-    .foot-brand img { width: 38px; height: 38px; border-radius: 10px; box-shadow: 0 10px 24px rgba(24,32,31,0.14); }
+    .foot-brand img { width: 38px; height: 38px; border-radius: 10px; box-shadow: 0 10px 24px rgba(24, 143, 242, 0.20); }
     .foot-brand .t { font-weight: 600; font-size: 17px; }
     .foot-brand .s { font-size: 13.5px; color: var(--faint); }
     .foot-links { display: flex; gap: 26px; }
@@ -310,7 +305,6 @@
       /* hero: tighten vertical rhythm; .hero is also .wrap, and this shorthand
          would zero its 18px gutter, so restore the left/right padding here */
       .hero { padding: 52px 18px; }
-      .app-mark { width: 88px; height: 88px; border-radius: 22px; margin-bottom: 24px; }
       .eyebrow { font-size: 12px; padding: 6px 13px; margin-bottom: 22px; }
       .hero h1 { margin-bottom: 20px; }
       .hero p.lead { margin-bottom: 30px; }
@@ -352,7 +346,7 @@
   <header class="nav" id="nav">
     <div class="wrap nav-inner">
       <a class="brand" href="#top" style="text-decoration:none;color:inherit">
-        <img src="assets/icon.png" alt="Lumo icon" />
+        <img src="assets/app-icon.png" alt="Lumo icon" />
         <span>Lumo</span>
       </a>
       <nav class="nav-links">
@@ -368,14 +362,13 @@
 
   <!-- HERO -->
   <section class="hero wrap">
-    <img class="app-mark pop p1" src="assets/icon.png" alt="Lumo — translation app icon" />
-    <div class="pop p2"><span class="eyebrow"><span class="dot"></span> Native macOS app · optional PopClip integration</span></div>
-    <h1 class="pop p3">AI text work, one <em>keystroke</em> away.</h1>
-    <p class="lead pop p4">
+    <div class="pop p1"><span class="eyebrow"><span class="dot"></span> Native macOS app · optional PopClip integration</span></div>
+    <h1 class="pop p2">AI text work, one <em>keystroke</em> away.</h1>
+    <p class="lead pop p3">
       Lumo translates, polishes, and summarizes text from the menu bar, a global shortcut,
       the clipboard, or PopClip. Bring your own API key; provider settings stay on your Mac.
     </p>
-    <div class="cta-row pop p5">
+    <div class="cta-row pop p4">
       <a class="btn btn-primary" href="https://github.com/iuhoay/lumo/releases/latest/download/Lumo.zip">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.6l3.3-3.3 1.4 1.4-5.7 5.7-5.7-5.7 1.4-1.4 3.3 3.3V3h2zM5 19h14v2H5z"/></svg>
         Download for macOS
@@ -385,7 +378,7 @@
         View on GitHub
       </a>
     </div>
-    <div class="screenshot-stage pop p6">
+    <div class="screenshot-stage pop p5">
       <div class="screenshot-glow"></div>
       <div class="screenshot-frame">
         <img src="assets/app-window.webp" alt="Lumo translating a short English paragraph into Simplified Chinese in the native macOS app window" loading="eager" />
@@ -536,7 +529,7 @@
   <footer>
     <div class="wrap foot-inner">
       <div class="foot-brand">
-        <img src="assets/icon.png" alt="Lumo icon" />
+        <img src="assets/app-icon.png" alt="Lumo icon" />
         <div>
           <div class="t">Lumo</div>
           <div class="s">Translate · Polish · Summarize — on macOS</div>
