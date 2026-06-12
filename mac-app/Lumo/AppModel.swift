@@ -16,7 +16,9 @@ final class AppModel: ObservableObject {
     @Published var output: String = ""
     @Published var resolvedTarget: String = ""
     @Published var isLoading: Bool = false
+    @Published var isCapturingScreenText: Bool = false
     @Published var errorText: String?
+    @Published var errorSettingsDestination: ErrorSettingsDestination?
     @Published var isPinned: Bool = false
     /// Bumped to ask the view to move keyboard focus into the input field
     /// (e.g. when the window opens empty for a new translation).
@@ -57,10 +59,26 @@ final class AppModel: ObservableObject {
         inputText = ""
         output = ""
         errorText = nil
+        errorSettingsDestination = nil
         resolvedTarget = ""
         isLoading = false
         windowController.present()
         focusInputToken &+= 1
+    }
+
+    /// Start a local screen-area OCR flow, then reuse the normal translation
+    /// path once the selected region has been recognized.
+    func captureScreenText() {
+        guard !isCapturingScreenText else { return }
+        guard ScreenCaptureService.hasScreenCaptureAccess else {
+            showOCRFailure(ScreenCaptureServiceError.screenRecordingPermissionDenied)
+            return
+        }
+        OCRSelectionWindowController.shared.beginSelection { [weak self] result in
+            Task { @MainActor in
+                await self?.handleOCRSelection(result)
+            }
+        }
     }
 
     /// Non-blank text on the general pasteboard, trimmed; `nil` when empty/none.
@@ -89,12 +107,14 @@ final class AppModel: ObservableObject {
             // doesn't linger under a now-changed mode label.
             output = ""
             errorText = nil
+            errorSettingsDestination = nil
             resolvedTarget = ""
             isLoading = false
             return
         }
         output = ""
         errorText = nil
+        errorSettingsDestination = nil
         isLoading = true
 
         let settings = AppSettings.shared
@@ -139,6 +159,7 @@ final class AppModel: ObservableObject {
                 if Task.isCancelled { return }
                 let message = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
                 self?.errorText = message
+                self?.errorSettingsDestination = .appSettings
             }
             self?.isLoading = false
         }
@@ -154,6 +175,50 @@ final class AppModel: ObservableObject {
             translate()
         }
     }
+
+    private func handleOCRSelection(_ result: OCRSelectionResult) async {
+        switch result {
+        case .cancelled:
+            return
+        case let .selected(region):
+            await recognizeScreenText(in: region)
+        }
+    }
+
+    private func recognizeScreenText(in region: OCRSelectionRegion) async {
+        isCapturingScreenText = true
+        defer { isCapturingScreenText = false }
+
+        do {
+            try await Task.sleep(for: .milliseconds(250))
+            let image = try await ScreenCaptureService.captureImage(in: region)
+            let result = try await OCRService.shared.recognizeText(in: image)
+            handle(TranslationRequest(text: result.text, mode: mode))
+        } catch {
+            showOCRFailure(error)
+        }
+    }
+
+    private func showOCRFailure(_ error: Error) {
+        task?.cancel()
+        inputText = ""
+        output = ""
+        resolvedTarget = ""
+        isLoading = false
+        errorText = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+        if let error = error as? ScreenCaptureServiceError, error == .screenRecordingPermissionDenied {
+            errorSettingsDestination = .screenRecording
+        } else {
+            errorSettingsDestination = nil
+        }
+        windowController.present()
+        focusInputToken &+= 1
+    }
+}
+
+enum ErrorSettingsDestination {
+    case appSettings
+    case screenRecording
 }
 
 /// Normalize raw pasteboard text for the ⇥-paste shortcut: trim surrounding
