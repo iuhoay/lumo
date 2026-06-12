@@ -6,9 +6,13 @@ struct LumoApp: App {
     @StateObject private var model = AppModel.shared
 
     var body: some Scene {
-        MenuBarExtra("Lumo", systemImage: "character.bubble") {
+        MenuBarExtra {
             MenuBarContent()
                 .environmentObject(model)
+        } label: {
+            Image("MenuBarIcon")
+                .renderingMode(.template)
+                .accessibilityLabel("Lumo")
         }
         // Settings is an AppKit-managed window (SettingsWindowController), not a
         // SwiftUI `Settings` scene: in this LSUIElement app the scene's

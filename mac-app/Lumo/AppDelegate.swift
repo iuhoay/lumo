@@ -5,6 +5,11 @@ import KeyboardShortcuts
 /// hook for scheme activation in a menu-bar (LSUIElement) app.
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_: Notification) {
+        if let iconURL = Bundle.main.url(forResource: "AppIcon", withExtension: "icns"),
+           let icon = NSImage(contentsOf: iconURL) {
+            NSApplication.shared.applicationIconImage = icon
+        }
+
         // Touch the singleton so Sparkle starts its scheduled background update
         // checks now, not only when the user opens the "Check for Updates…" menu item.
         _ = UpdaterController.shared
