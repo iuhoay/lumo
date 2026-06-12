@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-06-12
+
 ### Added
 
 - "Apple (On-Device)" provider powered by Apple's Foundation Models framework:
@@ -14,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   or cost. Requires an Apple Intelligence–capable Mac on macOS 26+; Settings
   shows a live readiness status and a clear message when the model is
   unavailable.
+
+### Changed
+
+- Refreshed the app icon and replaced the menu-bar glyph with a custom Lumo
+  icon (previously the generic `character.bubble` system symbol).
 
 ## [0.1.7] - 2026-06-02
 
@@ -93,7 +100,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Native menu-bar app** (`mac-app/`) — talks to the LLM provider, streams
     the result into a window, keeps a history, and can read it aloud.
 
-[Unreleased]: https://github.com/iuhoay/lumo/compare/v0.1.6...HEAD
+[Unreleased]: https://github.com/iuhoay/lumo/compare/v0.1.8...HEAD
+[0.1.8]: https://github.com/iuhoay/lumo/compare/v0.1.7...v0.1.8
+[0.1.7]: https://github.com/iuhoay/lumo/compare/v0.1.6...v0.1.7
 [0.1.6]: https://github.com/iuhoay/lumo/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/iuhoay/lumo/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/iuhoay/lumo/compare/v0.1.3...v0.1.4
