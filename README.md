@@ -17,9 +17,10 @@ aloud.
 
 - **Translate, polish, and summarize** text without opening a chat app.
 - **Start from anywhere** with the menu bar, a global shortcut, the clipboard,
-  or an optional PopClip action.
-- **Bring your own provider**: OpenAI, Anthropic (Claude), or any
-  OpenAI-compatible endpoint such as DeepSeek or local Ollama.
+  on-screen text via OCR, or an optional PopClip action.
+- **Bring your own provider**: OpenAI, Anthropic (Claude), any OpenAI-compatible
+  endpoint such as DeepSeek or local Ollama, or Apple's on-device model (no API
+  key needed).
 - **Keep the workflow native** with streaming output, history, text-to-speech,
   and a menu-bar app that stays out of the Dock.
 
@@ -36,10 +37,14 @@ or an optional PopClip action.
 
 - **Three text actions**: translate, polish, and summarize.
 - **Multiple ways to start**: menu bar, a configurable global shortcut, an empty
-  window that can paste and translate the clipboard with one keystroke, or
-  PopClip selection actions.
-- **Multiple providers**: OpenAI, Anthropic (Claude), and any
-  OpenAI-compatible endpoint (DeepSeek, local Ollama, etc.).
+  window that can paste and translate the clipboard with one keystroke,
+  screen-area OCR, or PopClip selection actions.
+- **Screen-area OCR**: drag-select any text on screen and recognize it locally
+  with macOS Vision — no network — then send it straight into Lumo.
+- **Multiple providers**: OpenAI, Anthropic (Claude), any OpenAI-compatible
+  endpoint (DeepSeek, local Ollama, etc.), and Apple's on-device Foundation
+  Models — which run entirely on-device with no API key, network, or cost
+  (requires an Apple Intelligence–capable Mac on macOS 26+).
 - **Streaming output** via Server-Sent Events — results appear token by token.
 - **Smart target language**: detects whether the input is Chinese and picks the
   target language accordingly (both directions are configurable).
@@ -122,6 +127,22 @@ If you use [PopClip](https://pilotmoon.com/popclip/), install
 to send selected text to Lumo in one click. The extension is only a trigger; the
 native app still handles the provider, API key, model, streaming result, and
 history.
+
+## Roadmap
+
+Lumo moves in small, shippable steps. The current focus is the
+[**v0.2.0 — UX**](https://github.com/iuhoay/lumo/milestone/1) milestone, all on
+the translation result window:
+
+- [Render results as Markdown](https://github.com/iuhoay/lumo/issues/21) so
+  summaries and lists read cleanly instead of showing raw markup.
+- [Keyboard-first window](https://github.com/iuhoay/lumo/issues/22): switch
+  actions with ⌘1 / ⌘2 / ⌘3 and regenerate with ⌘R.
+- [Auto-resize the window](https://github.com/iuhoay/lumo/issues/23) to fit the
+  result instead of scrolling inside a fixed box.
+
+Ideas and bug reports are welcome in the
+[issue tracker](https://github.com/iuhoay/lumo/issues).
 
 ## Development
 
