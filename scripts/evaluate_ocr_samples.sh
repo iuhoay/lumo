@@ -5,7 +5,6 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT_DIR="$ROOT_DIR/mac-app"
 SAMPLE_DIR="$ROOT_DIR/mac-app/LumoTests/Fixtures/OCRSamples"
 OUTPUT_DIR="$PROJECT_DIR/build/ocr-eval"
-CONFIG_FILE="$OUTPUT_DIR/config.json"
 STRICT=0
 
 usage() {
@@ -61,19 +60,13 @@ MESSAGE
   exit 0
 fi
 
-cleanup() {
-  /bin/rm -f "$CONFIG_FILE"
-}
-trap cleanup EXIT
-
-cat >"$CONFIG_FILE" <<JSON
-{
-  "sampleDirectory": "$SAMPLE_DIR",
-  "outputDirectory": "$OUTPUT_DIR",
-  "strict": $([[ "$STRICT" == "1" ]] && echo true || echo false)
-}
-JSON
-
+# Pass configuration through the environment instead of a file. xcodebuild
+# forwards TEST_RUNNER_-prefixed variables to the test process with the prefix
+# stripped, so there is no config file to JSON-escape or to leak into a later
+# plain `xcodebuild test` run.
+TEST_RUNNER_LUMO_OCR_EVAL_SAMPLES="$SAMPLE_DIR" \
+TEST_RUNNER_LUMO_OCR_EVAL_OUTPUT="$OUTPUT_DIR" \
+TEST_RUNNER_LUMO_OCR_EVAL_STRICT="$STRICT" \
 xcodebuild \
   -project "$PROJECT_DIR/Lumo.xcodeproj" \
   -scheme Lumo \
@@ -85,3 +78,8 @@ xcodebuild \
 echo
 echo "OCR evaluation report:"
 echo "  $OUTPUT_DIR/summary.tsv"
+if [[ "$STRICT" != "1" ]]; then
+  echo
+  echo "Scores are report-only; this run passes regardless of OCR quality."
+  echo "Re-run with --strict to fail when a required sample is below threshold."
+fi

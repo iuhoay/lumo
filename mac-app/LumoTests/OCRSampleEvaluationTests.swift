@@ -6,7 +6,7 @@ import Testing
 struct OCRSampleEvaluationTests {
     @Test("evaluates real OCR fixtures")
     func evaluatesRealOCRFixtures() async throws {
-        guard let config = try OCREvaluationConfig.loadIfPresent() else {
+        guard let config = OCREvaluationConfig.fromEnvironment() else {
             return
         }
 
@@ -42,20 +42,70 @@ struct OCRSampleEvaluationTests {
     }
 }
 
-private struct OCREvaluationConfig: Decodable {
+/// Unit tests for the scoring helpers. Unlike `OCRSampleEvaluationTests`, these
+/// do not depend on fixtures or the environment gate, so they run in CI.
+@Suite("OCR scoring helpers")
+struct OCRScoringHelperTests {
+    @Test("identical text scores 1")
+    func identicalTextScoresOne() {
+        #expect(textSimilarity("Hello 世界", "Hello 世界") == 1)
+    }
+
+    @Test("similarity ignores case and collapses whitespace")
+    func similarityIgnoresCaseAndWhitespace() {
+        #expect(textSimilarity("Open  System\nSettings", "open system settings") == 1)
+    }
+
+    @Test("two blank strings score 1")
+    func bothBlankScoreOne() {
+        #expect(textSimilarity("", "   \n ") == 1)
+    }
+
+    @Test("one empty string scores 0")
+    func oneEmptyScoresZero() {
+        #expect(textSimilarity("text", "") == 0)
+    }
+
+    @Test("partial mismatch scores 1 minus the normalized edit distance")
+    func partialMismatchScoresFraction() {
+        // "kitten" -> "sitting" is edit distance 3 over a max length of 7.
+        #expect(abs(textSimilarity("kitten", "sitting") - (1 - 3.0 / 7.0)) < 1e-9)
+    }
+
+    @Test("levenshtein distance matches a known value")
+    func levenshteinKnownValue() {
+        #expect(levenshteinDistance(Array("kitten"), Array("sitting")) == 3)
+    }
+
+    @Test("levenshtein distance is 0 for equal input")
+    func levenshteinZeroForEqual() {
+        #expect(levenshteinDistance(Array("abc"), Array("abc")) == 0)
+    }
+}
+
+private struct OCREvaluationConfig {
     var sampleDirectory: String
     var outputDirectory: String
     var strict: Bool
 
-    static func loadIfPresent() throws -> OCREvaluationConfig? {
-        let configURL = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .appendingPathComponent("build/ocr-eval/config.json")
+    /// Reads configuration from the environment so the harness only runs when
+    /// `scripts/evaluate_ocr_samples.sh` invokes it (it forwards these via
+    /// `TEST_RUNNER_`-prefixed variables). Returns `nil` during a normal
+    /// `xcodebuild test`, making this suite a no-op in CI.
+    static func fromEnvironment() -> OCREvaluationConfig? {
+        let environment = ProcessInfo.processInfo.environment
+        guard let sampleDirectory = environment["LUMO_OCR_EVAL_SAMPLES"],
+              let outputDirectory = environment["LUMO_OCR_EVAL_OUTPUT"]
+        else { return nil }
 
-        guard FileManager.default.fileExists(atPath: configURL.path) else { return nil }
-        let data = try Data(contentsOf: configURL)
-        return try JSONDecoder().decode(OCREvaluationConfig.self, from: data)
+        let strict = ["1", "true", "yes"].contains(
+            (environment["LUMO_OCR_EVAL_STRICT"] ?? "").lowercased()
+        )
+        return OCREvaluationConfig(
+            sampleDirectory: sampleDirectory,
+            outputDirectory: outputDirectory,
+            strict: strict
+        )
     }
 }
 

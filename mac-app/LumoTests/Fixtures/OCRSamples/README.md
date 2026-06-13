@@ -38,3 +38,9 @@ Run:
 
 The report is written to `mac-app/build/ocr-eval/` with a `summary.tsv` plus
 per-sample `recognized.txt`, `expected.txt`, and `diff.txt` files.
+
+This is a **manual tuning harness, not a CI gate.** `OCRSampleEvaluationTests`
+reads its configuration from environment variables that only
+`evaluate_ocr_samples.sh` sets, so it is a no-op during a normal
+`xcodebuild test` run. By default the run is report-only and always succeeds;
+pass `--strict` to fail when a required sample scores below its threshold.
