@@ -32,10 +32,15 @@ final class OCRService {
     func recognizeText(in image: CGImage) async throws -> OCRResult {
         try await Task.detached(priority: .userInitiated) {
             let prepared = Self.preparedImage(from: image)
+            // Both candidates run on the upscaled image: upscaling improves CJK
+            // recognition, and Vision can confidently misread small dark text on
+            // the original (e.g. "屏幕文字" -> "A#X7" at confidence 1.0), which
+            // would then win the score() comparison. When `preparedImage` skips
+            // upscaling (large images) it returns the original, so the original
+            // resolution is still covered here.
             let candidates = try [
                 Self.recognize(prepared, configuration: .zhHansEnglish),
-                Self.recognize(prepared, configuration: .automaticLanguage),
-                Self.recognize(image, configuration: .automaticLanguage)
+                Self.recognize(prepared, configuration: .automaticLanguage)
             ]
 
             guard let best = candidates.max(by: { Self.score($0) < Self.score($1) }),
