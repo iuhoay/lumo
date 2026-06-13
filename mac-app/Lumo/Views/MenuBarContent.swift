@@ -1,4 +1,5 @@
 import AppKit
+import KeyboardShortcuts
 import SwiftUI
 
 /// Menu shown when clicking the menu-bar icon.
@@ -10,9 +11,15 @@ struct MenuBarContent: View {
         Button("New Translation…") {
             model.newTranslation()
         }
+        // Show the user's recorded global hotkey in the menu's key column (and
+        // keep it live as they re-record in Settings). Display only — it does NOT
+        // re-fire the action, so the global handler in AppDelegate stays the
+        // single trigger and nothing double-runs.
+        .globalKeyboardShortcut(.newTranslation)
         Button("OCR Screen Text…") {
             model.captureScreenText()
         }
+        .globalKeyboardShortcut(.ocrScreenText)
         .disabled(model.isCapturingScreenText)
         Divider()
         Button("About Lumo") {
