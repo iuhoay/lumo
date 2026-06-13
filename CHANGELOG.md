@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Screen-area OCR from the menu bar: drag-select text on screen, recognize it
   locally with macOS Vision, and send the result into Lumo. Includes Screen
   Recording permission guidance and a configurable global shortcut in Settings.
+- Local OCR sample evaluation harness for tuning recognition quality against
+  real screenshot fixtures.
 
 ## [0.1.8] - 2026-06-12
 
