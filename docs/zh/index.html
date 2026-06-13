@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lumo — 在 macOS 上翻译、润色、总结任意文本</title>
+  <meta name="description" content="Lumo 是一款原生 macOS 文本助手，可从菜单栏、全局快捷键、剪贴板、屏幕 OCR 或 PopClip 翻译、润色、总结文本。自带 API Key——或使用 Apple 端侧模型，无需任何密钥。免费且开源。" />
+
+  <!-- Canonical + language alternates -->
+  <link rel="canonical" href="https://iuhoay.dev/lumo/zh/" />
+  <link rel="alternate" hreflang="en" href="https://iuhoay.dev/lumo/" />
+  <link rel="alternate" hreflang="zh-Hans" href="https://iuhoay.dev/lumo/zh/" />
+  <link rel="alternate" hreflang="x-default" href="https://iuhoay.dev/lumo/" />
+
+  <!-- Social preview -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://iuhoay.dev/lumo/zh/" />
+  <meta property="og:locale" content="zh_CN" />
+  <meta property="og:locale:alternate" content="en_US" />
+  <meta property="og:title" content="Lumo — 在 macOS 上翻译、润色、总结任意文本" />
+  <meta property="og:description" content="在 macOS 上随处翻译、润色、总结文本。可使用菜单栏、全局快捷键、剪贴板、屏幕 OCR 或 PopClip。自带 API Key——或使用 Apple 端侧模型，无需任何密钥。" />
+  <meta property="og:image" content="https://iuhoay.dev/lumo/assets/banner.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" type="image/png" href="../assets/icon.png" />
+  <link rel="apple-touch-icon" href="../assets/app-icon.png" />
+
+  <!-- Fonts: Fraunces (luminous editorial serif, display) + Hanken Grotesk (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Simplified Chinese glyphs (this page only; Latin stays Fraunces/Hanken) -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+  <div class="atmosphere"></div>
+  <div class="grain"></div>
+
+  <!-- NAV -->
+  <header class="nav" id="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" style="text-decoration:none;color:inherit">
+        <img src="../assets/app-icon.png" alt="Lumo 图标" />
+        <span>Lumo</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#features">功能</a>
+        <a href="#how">用法</a>
+        <a href="https://github.com/iuhoay/lumo" target="_blank" rel="noopener">GitHub</a>
+        <a href="../" hreflang="en">EN</a>
+        <a class="ghost-pill" href="#download">下载</a>
+      </nav>
+    </div>
+  </header>
+
+  <a id="top"></a>
+
+  <!-- HERO -->
+  <section class="hero wrap">
+    <div class="pop p1"><span class="eyebrow"><span class="dot"></span> 原生 macOS 应用 · 可选 PopClip 集成</span></div>
+    <h1 class="pop p2">AI 文本处理，<em>一键</em>即达。</h1>
+    <p class="lead pop p3">
+      Lumo 可从菜单栏、全局快捷键、剪贴板、屏幕 OCR 或 PopClip 翻译、润色、总结文本。
+      自带 API Key——或使用 Apple 端侧模型，无需任何密钥；服务商配置始终保存在你的 Mac 上。
+    </p>
+    <div class="cta-row pop p4">
+      <a class="btn btn-primary" href="https://github.com/iuhoay/lumo/releases/latest/download/Lumo.zip">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.6l3.3-3.3 1.4 1.4-5.7 5.7-5.7-5.7 1.4-1.4 3.3 3.3V3h2zM5 19h14v2H5z"/></svg>
+        下载 macOS 版
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/iuhoay/lumo" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.37.5 0 5.78 0 12.29c0 5.21 3.44 9.63 8.21 11.19.6.11.82-.26.82-.57v-2c-3.34.72-4.04-1.59-4.04-1.59-.55-1.36-1.34-1.72-1.34-1.72-1.09-.73.08-.72.08-.72 1.2.08 1.84 1.22 1.84 1.22 1.07 1.8 2.81 1.28 3.5.98.1-.76.42-1.28.76-1.58-2.67-.3-5.47-1.31-5.47-5.83 0-1.29.47-2.34 1.24-3.16-.13-.3-.54-1.5.11-3.12 0 0 1.01-.32 3.3 1.21.96-.26 1.98-.39 3-.4 1.02.01 2.04.14 3 .4 2.29-1.53 3.3-1.21 3.3-1.21.65 1.62.24 2.82.12 3.12.77.82 1.23 1.87 1.23 3.16 0 4.53-2.81 5.53-5.49 5.82.43.37.81 1.1.81 2.22v3.29c0 .31.22.69.83.57C20.57 21.92 24 17.5 24 12.29 24 5.78 18.63.5 12 .5z"/></svg>
+        在 GitHub 查看
+      </a>
+    </div>
+    <div class="screenshot-stage pop p5">
+      <div class="screenshot-glow"></div>
+      <div class="screenshot-frame">
+        <img src="../assets/app-window.webp" alt="Lumo 正在原生 macOS 应用窗口中将一段英文翻译为简体中文" loading="eager" />
+      </div>
+    </div>
+    <p class="meta pop p6"><b>免费开源</b> · 需 macOS 26+ · OpenAI · Claude · DeepSeek · Apple 端侧模型 &amp; 任意兼容 OpenAI 的 API</p>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="kicker">功能</div>
+        <h2>小巧轻量，能力出众。</h2>
+        <p>一个菜单栏应用搞定所有重活——服务商、流式输出、历史记录与朗读——而每个入口都保持轻快。</p>
+      </div>
+
+      <div class="workflow-panel">
+        <div class="card reveal">
+          <div class="ic">✶</div>
+          <h3>文本操作 · 自选服务商</h3>
+          <p>从应用窗口、剪贴板、快捷键流程、屏幕 OCR 或选中文本翻译、润色、总结。将 Lumo 指向 OpenAI、Claude、DeepSeek、本地 Ollama、任意兼容 OpenAI 的接口，或 Apple 端侧模型——无需 API Key。</p>
+          <div class="glyphs">
+            <span>翻译<small>Translate</small></span>
+            <span>润色<small>Polish</small></span>
+            <span>总结<small>Summarize</small></span>
+          </div>
+          <div class="providers">
+            <span>OpenAI</span><span>Anthropic · Claude</span><span>DeepSeek</span><span>Ollama</span><span>Apple · 端侧</span><span>兼容 OpenAI</span>
+          </div>
+        </div>
+        <div class="settings-showcase reveal d1">
+          <img src="../assets/settings.webp" alt="Lumo 设置界面，显示兼容 OpenAI 的服务商、隐藏的 API Key、DeepSeek Base URL、模型与翻译语言选项" loading="lazy" />
+        </div>
+      </div>
+
+      <div class="bento">
+
+        <div class="card wide-2 reveal">
+          <div class="ic">⚡</div>
+          <h3>流式输出</h3>
+          <p>通过 Server-Sent Events 逐字呈现结果——无需对着转圈干等。</p>
+        </div>
+        <div class="card wide-2 reveal d1">
+          <div class="ic">🌐</div>
+          <h3>智能目标语言</h3>
+          <p>自动判断输入是否为中文并切换翻译方向，两端语言均可配置。</p>
+        </div>
+        <div class="card wide-2 reveal d2">
+          <div class="ic">🕘</div>
+          <h3>翻译历史</h3>
+          <p>每条结果都会保存到可检索的主从视图浏览器，随时回看。</p>
+        </div>
+
+        <div class="card wide-2 reveal">
+          <div class="ic">🔊</div>
+          <h3>朗读</h3>
+          <p>内置文本转语音，可按需朗读原文或结果。</p>
+        </div>
+        <div class="card wide-2 reveal d1">
+          <div class="ic">🪶</div>
+          <h3>仅驻留菜单栏</h3>
+          <p>以 <code>LSUIElement</code> 方式运行——没有 Dock 图标，不占用窗口。需要时随叫随到。</p>
+        </div>
+        <div class="card wide-2 reveal d2">
+          <div class="ic">↻</div>
+          <h3>自动更新</h3>
+          <p>Sparkle 在后台检查更新并就地安装新版本——经签名验证。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="kicker">用法</div>
+        <h2>选择最顺手的入口。</h2>
+        <p>Lumo 首先是一款可独立使用的应用，PopClip 则是处理选中文本的可选快捷通道。</p>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <div class="n">01</div>
+          <h3>打开 Lumo</h3>
+          <p>使用菜单栏、设置全局快捷键，或在想处理剪贴板内容时打开一个空窗口。</p>
+        </div>
+        <div class="step reveal d1">
+          <div class="n">02</div>
+          <h3>送入文本</h3>
+          <p>直接粘贴或输入文本，按 <span class="cn">Tab</span> 使用剪贴板，用 OCR 抓取屏幕文字，或在 PopClip 中点按 <span class="cn">翻译</span>、<span class="cn">润色</span>、<span class="cn">总结</span>。</p>
+        </div>
+        <div class="step reveal d2">
+          <div class="n">03</div>
+          <h3>查看流式结果</h3>
+          <p>应用打开时结果即流式呈现——自动保存到历史，可随时复制或朗读。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD -->
+  <section id="download">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="kicker">获取 Lumo</div>
+        <h2>两步即可上手。</h2>
+        <p>先安装应用。PopClip 为可选项；首次启动后，更新由 Sparkle 自动处理。</p>
+      </div>
+
+      <div class="install-grid">
+        <div class="install-card reveal">
+          <div class="tag">第一步 · 应用</div>
+          <h3>安装 Lumo.app</h3>
+          <p><a class="inline" href="https://github.com/iuhoay/lumo/releases/latest/download/Lumo.zip">下载 Lumo.zip</a>，解压后将 <b>Lumo.app</b> 移动到 <code>/Applications</code>。首次需清除一次隔离属性：</p>
+          <div class="term">
+            <code id="xattr-cmd">xattr -dr com.apple.quarantine /Applications/Lumo.app</code>
+            <button id="copyBtn" type="button">复制</button>
+          </div>
+          <p>应用会驻留菜单栏——请在顶部查看，而非 Dock。之后 Sparkle 会让它保持最新。</p>
+        </div>
+
+        <div class="install-card reveal d1">
+          <div class="tag">第二步 · 设置</div>
+          <h3>配置你的服务商</h3>
+          <p>从菜单栏打开 Lumo，在<b>设置</b>中配置服务商、模型、API Key、翻译语言以及可选的全局快捷键。</p>
+          <p>可使用 OpenAI、Claude、DeepSeek、本地 Ollama、其他兼容 OpenAI 的接口，或 Apple 端侧模型（无需 API Key）。</p>
+        </div>
+      </div>
+
+      <div class="install-card reveal d2">
+        <div class="tag">可选集成</div>
+        <h3>添加 PopClip 处理选中文本</h3>
+        <p>如果你使用 <a class="inline" href="https://pilotmoon.com/popclip/" target="_blank" rel="noopener">PopClip</a>，安装 <a class="inline" href="https://github.com/iuhoay/lumo/tree/main/Lumo.popclipext" target="_blank" rel="noopener">Lumo.popclipext</a> 即可一键将选中文本发送给 Lumo。该扩展仅作触发器；服务商、流式输出、历史与朗读仍由 Lumo.app 处理。</p>
+      </div>
+
+      <div class="dl-final reveal d2">
+        <a class="btn btn-primary" href="https://github.com/iuhoay/lumo/releases/latest/download/Lumo.zip">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.6l3.3-3.3 1.4 1.4-5.7 5.7-5.7-5.7 1.4-1.4 3.3 3.3V3h2zM5 19h14v2H5z"/></svg>
+          下载 Lumo.zip
+        </a>
+        <p class="req"><b>系统要求：</b>macOS 26.0+ · 所选 LLM 服务商的 API Key · PopClip 可选</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="wrap foot-inner">
+      <div class="foot-brand">
+        <img src="../assets/app-icon.png" alt="Lumo 图标" />
+        <div>
+          <div class="t">Lumo</div>
+          <div class="s">翻译 · 润色 · 总结 — 在 macOS 上</div>
+        </div>
+      </div>
+      <nav class="foot-links">
+        <a href="../" hreflang="en">English</a>
+        <a href="https://github.com/iuhoay/lumo" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/iuhoay/lumo/releases" target="_blank" rel="noopener">发布</a>
+        <a href="https://github.com/iuhoay/lumo/blob/main/LICENSE" target="_blank" rel="noopener">许可证</a>
+        <a href="https://pilotmoon.com/popclip/" target="_blank" rel="noopener">PopClip</a>
+      </nav>
+      <div class="copyright">© <span id="year">2026</span> iuhoay · 基于 MIT 许可证发布 · 你的 API Key 始终保留在本机。</div>
+    </div>
+  </footer>
+
+  <script>
+    // Nav border on scroll
+    const nav = document.getElementById('nav');
+    const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 12);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Scroll reveal
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.14 });
+    document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+    // Pointer-tracking spotlight on feature cards
+    document.querySelectorAll('.card').forEach((card) => {
+      card.addEventListener('pointermove', (ev) => {
+        const r = card.getBoundingClientRect();
+        card.style.setProperty('--mx', (ev.clientX - r.left) + 'px');
+        card.style.setProperty('--my', (ev.clientY - r.top) + 'px');
+      });
+    });
+
+    // Copy the quarantine command
+    const copyBtn = document.getElementById('copyBtn');
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(document.getElementById('xattr-cmd').textContent.trim());
+        copyBtn.textContent = '已复制 ✓';
+        setTimeout(() => (copyBtn.textContent = '复制'), 1600);
+      } catch (_) { copyBtn.textContent = '请按 ⌘C'; }
+    });
+
+    // Year (Date is fine in the browser at view time)
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
