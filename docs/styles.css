@@ -46,6 +46,13 @@ html[lang="zh-Hans"] .hero h1 em {
   text-underline-offset: 0.12em;
 }
 
+/* The 16ch cap is tuned for the English wording; Chinese glyphs are wider, so it
+   forced an awkward mid-phrase wrap (一键即 / 达。). Let the Chinese headline take
+   its natural width — one line on desktop, wraps per-character on small screens. */
+html[lang="zh-Hans"] .hero h1 {
+  max-width: none;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
