@@ -1,0 +1,1 @@
+Screen Recording permission is required for OCR. Grant access in System Settings, then restart Lumo.

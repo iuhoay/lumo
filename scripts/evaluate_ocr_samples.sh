@@ -5,6 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT_DIR="$ROOT_DIR/mac-app"
 SAMPLE_DIR="$ROOT_DIR/mac-app/LumoTests/Fixtures/OCRSamples"
 OUTPUT_DIR="$PROJECT_DIR/build/ocr-eval"
+CONFIG_FILE="$OUTPUT_DIR/config.json"
 STRICT=0
 
 usage() {
@@ -60,9 +61,19 @@ MESSAGE
   exit 0
 fi
 
-LUMO_OCR_SAMPLE_DIR="$SAMPLE_DIR" \
-LUMO_OCR_EVAL_OUTPUT_DIR="$OUTPUT_DIR" \
-LUMO_OCR_EVAL_STRICT="$STRICT" \
+cleanup() {
+  /bin/rm -f "$CONFIG_FILE"
+}
+trap cleanup EXIT
+
+cat >"$CONFIG_FILE" <<JSON
+{
+  "sampleDirectory": "$SAMPLE_DIR",
+  "outputDirectory": "$OUTPUT_DIR",
+  "strict": $([[ "$STRICT" == "1" ]] && echo true || echo false)
+}
+JSON
+
 xcodebuild \
   -project "$PROJECT_DIR/Lumo.xcodeproj" \
   -scheme Lumo \

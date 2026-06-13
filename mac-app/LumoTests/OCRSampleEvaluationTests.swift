@@ -6,14 +6,12 @@ import Testing
 struct OCRSampleEvaluationTests {
     @Test("evaluates real OCR fixtures")
     func evaluatesRealOCRFixtures() async throws {
-        let environment = ProcessInfo.processInfo.environment
-        guard let sampleDirectory = environment["LUMO_OCR_SAMPLE_DIR"], !sampleDirectory.isEmpty else {
+        guard let config = try OCREvaluationConfig.loadIfPresent() else {
             return
         }
 
-        let sampleURL = URL(fileURLWithPath: sampleDirectory, isDirectory: true)
-        let outputURL = URL(fileURLWithPath: environment["LUMO_OCR_EVAL_OUTPUT_DIR"] ?? "build/ocr-eval", isDirectory: true)
-        let strict = environment["LUMO_OCR_EVAL_STRICT"] == "1"
+        let sampleURL = URL(fileURLWithPath: config.sampleDirectory, isDirectory: true)
+        let outputURL = URL(fileURLWithPath: config.outputDirectory, isDirectory: true)
         let samples = try OCRSample.load(from: sampleURL)
 
         try FileManager.default.createDirectory(at: outputURL, withIntermediateDirectories: true)
@@ -34,13 +32,30 @@ struct OCRSampleEvaluationTests {
             rows.append(row)
             try writeSampleReport(sample: sample, recognized: recognized, score: score, status: status, to: outputURL)
 
-            if strict, sample.required {
+            if config.strict, sample.required {
                 #expect(score >= sample.threshold, "OCR score for \(sample.name) was \(score), below \(sample.threshold)")
             }
         }
 
         try writeSummary(rows, to: outputURL)
         print(summaryTable(rows))
+    }
+}
+
+private struct OCREvaluationConfig: Decodable {
+    var sampleDirectory: String
+    var outputDirectory: String
+    var strict: Bool
+
+    static func loadIfPresent() throws -> OCREvaluationConfig? {
+        let configURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("build/ocr-eval/config.json")
+
+        guard FileManager.default.fileExists(atPath: configURL.path) else { return nil }
+        let data = try Data(contentsOf: configURL)
+        return try JSONDecoder().decode(OCREvaluationConfig.self, from: data)
     }
 }
 
