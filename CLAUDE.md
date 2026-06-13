@@ -65,7 +65,12 @@ inline YAML, and shellcheck it. Before tagging:
    section (Keep a Changelog format). `scripts/release_notes.py` extracts this
    section by its `[X.Y.Z]` heading for the release body and the Sparkle
    appcast, so the heading must match the tag.
-3. Commit, then `git tag vX.Y.Z && git push origin vX.Y.Z`.
+3. Commit the bump on a release branch and merge it via PR — **direct pushes to
+   `main` are rejected by a branch ruleset** (`GH013`). Only after the release
+   commit lands on `main`, tag that commit and push the tag (tags bypass the
+   ruleset and the tag push is what triggers CI):
+   `git tag vX.Y.Z <merged-sha> && git push origin vX.Y.Z`. Tagging before the
+   commit is on `main` leaves the tag pointing off-`main`.
 
 The `/release` skill does steps 1–3.
 
