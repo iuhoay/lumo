@@ -42,12 +42,13 @@ struct SettingsView: View {
                 TextField("Non-Chinese input → translate to", text: $settings.targetWhenOther)
             }
 
-            Section("Shortcut") {
+            Section("Shortcuts") {
                 // Recording here updates the global hotkey live (AppDelegate
                 // registered the handler at launch against the same name).
                 // Recorder's title is a plain String, so localize it explicitly
                 // via the xcstrings table rather than a LocalizedStringKey literal.
                 KeyboardShortcuts.Recorder(String(localized: "New Translation…"), name: .newTranslation)
+                KeyboardShortcuts.Recorder(String(localized: "OCR Screen Text…"), name: .ocrScreenText)
             }
         }
         .formStyle(.grouped)

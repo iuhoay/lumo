@@ -3,12 +3,17 @@ import SwiftUI
 
 /// Menu shown when clicking the menu-bar icon.
 struct MenuBarContent: View {
+    @EnvironmentObject private var model: AppModel
     @ObservedObject private var updater = UpdaterController.shared
 
     var body: some View {
         Button("New Translation…") {
-            AppModel.shared.newTranslation()
+            model.newTranslation()
         }
+        Button("OCR Screen Text…") {
+            model.captureScreenText()
+        }
+        .disabled(model.isCapturingScreenText)
         Divider()
         Button("About Lumo") {
             // LSUIElement apps have no standard app menu, so the system "About"

@@ -160,12 +160,12 @@ struct TranslationView: View {
                         .foregroundStyle(.red)
                         .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    // The error (e.g. "No API key set") names Settings; give the
-                    // user a way to reach it from the floating panel itself.
-                    Button("Open Settings") {
-                        SettingsWindowController.shared.present()
+                    if let destination = model.errorSettingsDestination {
+                        Button(settingsButtonTitle(for: destination)) {
+                            openSettings(destination)
+                        }
+                        .controlSize(.small)
                     }
-                    .controlSize(.small)
                 }
             } else if model.output.isEmpty && model.isLoading {
                 Text("Translating…")
@@ -188,6 +188,22 @@ struct TranslationView: View {
         case .summarize: return "Summary"
         case .polish: return "Polished"
         case .translate: return "Translation"
+        }
+    }
+
+    private func settingsButtonTitle(for destination: ErrorSettingsDestination) -> LocalizedStringKey {
+        switch destination {
+        case .appSettings: return "Open Settings"
+        case .screenRecording: return "Open System Settings"
+        }
+    }
+
+    private func openSettings(_ destination: ErrorSettingsDestination) {
+        switch destination {
+        case .appSettings:
+            SettingsWindowController.shared.present()
+        case .screenRecording:
+            ScreenCaptureService.openScreenRecordingSettings()
         }
     }
 

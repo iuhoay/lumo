@@ -91,6 +91,16 @@
         }
       }
     },
+    "Drag to select text. Press Esc to cancel." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拖拽选择文字区域。按 Esc 取消。"
+          }
+        }
+      }
+    },
     "Invalid Base URL. Check Settings." : {
       "localizations" : {
         "zh-Hans" : {
@@ -151,6 +161,16 @@
         }
       }
     },
+    "No readable text was found in the selected area." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选区域中没有识别到可读文字。"
+          }
+        }
+      }
+    },
     "No history yet" : {
       "localizations" : {
         "zh-Hans" : {
@@ -171,12 +191,32 @@
         }
       }
     },
+    "OCR Screen Text…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OCR 屏幕文字…"
+          }
+        }
+      }
+    },
     "Open Settings" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开设置"
+          }
+        }
+      }
+    },
+    "Open System Settings" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开系统设置"
           }
         }
       }
@@ -291,6 +331,16 @@
         }
       }
     },
+    "Select a larger screen area to read." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请选择更大的屏幕区域。"
+          }
+        }
+      }
+    },
     "Settings" : {
       "localizations" : {
         "zh-Hans" : {
@@ -312,6 +362,16 @@
       }
     },
     "Shortcut" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "快捷键"
+          }
+        }
+      }
+    },
+    "Shortcuts" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -447,6 +507,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "在 GitHub 上查看"
+          }
+        }
+      }
+    },
+    "Lumo could not capture the selected screen area." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lumo 无法截取所选屏幕区域。"
+          }
+        }
+      }
+    },
+    "Screen Recording permission is required for OCR. Grant access in System Settings, then restart Lumo." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OCR 需要“屏幕录制”权限。请在“系统设置”中授予权限，然后重启 Lumo。"
           }
         }
       }
