@@ -1,0 +1,5 @@
+Command Palette
+OCR 屏幕文字 / Screen Text
+选择区域后，Lumo 会识别文本并填入输入框。
+Shortcut: ⌥ Space Mode: Translate Language: zh-Hans + en-US
+Search: summarize release notes / 总结更新日志

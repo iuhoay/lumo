@@ -27,6 +27,9 @@ Suggested coverage:
 - Code blocks, menus, popovers, and dialogs.
 - Retina screenshots and multi-display captures.
 
+Seed fixtures include real CleanShot captures plus generated mixed
+Chinese/English samples rendered with Google Fonts Inter and Noto Sans SC.
+
 Run:
 
 ```sh

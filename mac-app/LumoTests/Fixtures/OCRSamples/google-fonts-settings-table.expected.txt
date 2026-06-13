@@ -1,0 +1,17 @@
+Settings · OCR Evaluation
+使用 Google Fonts 生成的小字号中英混排设置界面。
+Option
+Value
+说明
+Recognition level
+accurate
+优先准确率
+Languages
+zh-Hans, en-US
+中文和英文混合
+Sample threshold
+0.85
+低于阈值时标记失败
+Output folder
+build/ocr-eval
+保存 diff 和 summary
