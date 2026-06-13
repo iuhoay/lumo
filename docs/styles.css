@@ -23,6 +23,14 @@
   --maxw: 1140px;
 }
 
+/* Simplified Chinese page (docs/zh/): Latin keeps Fraunces/Hanken, CJK glyphs
+   use Noto Sans SC — the webfont is loaded only in docs/zh/index.html's <head>,
+   so the English page never downloads it. */
+html[lang="zh-Hans"] {
+  --display: "Fraunces", "Noto Sans SC", "Iowan Old Style", Georgia, serif;
+  --body: "Hanken Grotesk", "Noto Sans SC", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
