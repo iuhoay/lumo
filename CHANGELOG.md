@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.9] - 2026-06-13
+
 ### Added
 
 - Screen-area OCR from the menu bar: drag-select text on screen, recognize it
@@ -14,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Recording permission guidance and a configurable global shortcut in Settings.
 - Local OCR sample evaluation harness for tuning recognition quality against
   real screenshot fixtures.
+- The menu-bar menu now shows your assigned global shortcuts for "New
+  Translation…" and "OCR Screen Text…" next to each item, updating live as you
+  re-record them in Settings.
 
 ## [0.1.8] - 2026-06-12
 
@@ -108,7 +113,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Native menu-bar app** (`mac-app/`) — talks to the LLM provider, streams
     the result into a window, keeps a history, and can read it aloud.
 
-[Unreleased]: https://github.com/iuhoay/lumo/compare/v0.1.8...HEAD
+[Unreleased]: https://github.com/iuhoay/lumo/compare/v0.1.9...HEAD
+[0.1.9]: https://github.com/iuhoay/lumo/compare/v0.1.8...v0.1.9
 [0.1.8]: https://github.com/iuhoay/lumo/compare/v0.1.7...v0.1.8
 [0.1.7]: https://github.com/iuhoay/lumo/compare/v0.1.6...v0.1.7
 [0.1.6]: https://github.com/iuhoay/lumo/compare/v0.1.5...v0.1.6
