@@ -8,4 +8,9 @@ extension KeyboardShortcuts.Name {
     /// in Settings. KeyboardShortcuts persists the choice in UserDefaults; until
     /// one is set, nothing is registered and the action is menu-only.
     static let newTranslation = Self("newTranslation")
+
+    /// System-wide hotkey that starts the screen-area OCR flow. Like New
+    /// Translation, it ships with no default to avoid stealing popular global
+    /// shortcuts from the user's launcher or window manager.
+    static let ocrScreenText = Self("ocrScreenText")
 }

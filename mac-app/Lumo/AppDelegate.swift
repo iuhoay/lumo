@@ -6,7 +6,8 @@ import KeyboardShortcuts
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_: Notification) {
         if let iconURL = Bundle.main.url(forResource: "AppIcon", withExtension: "icns"),
-           let icon = NSImage(contentsOf: iconURL) {
+           let icon = NSImage(contentsOf: iconURL)
+        {
             NSApplication.shared.applicationIconImage = icon
         }
 
@@ -20,6 +21,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         KeyboardShortcuts.onKeyUp(for: .newTranslation) {
             MainActor.assumeIsolated {
                 AppModel.shared.newTranslation()
+            }
+        }
+
+        KeyboardShortcuts.onKeyUp(for: .ocrScreenText) {
+            MainActor.assumeIsolated {
+                AppModel.shared.captureScreenText()
             }
         }
     }
