@@ -1,0 +1,5 @@
+Screen Recording
+"Lumo Dev.app" would like to record this computer's screen and audio.
+Grant access to this application in Privacy & Security settings, located in System Settings.
+Open System Settings
+Deny

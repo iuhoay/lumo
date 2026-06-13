@@ -1,0 +1,5 @@
+Lumo OCR 中英文混合样本
+Use local Vision OCR to read selected screen text.
+这是一段真实网页风格的中文正文，包含 English words 和数字 2026。
+用户可以先检查识别结果，再翻译、润色或总结。
+Status: ready · Provider: Apple On-Device · Confidence target: 0.90
