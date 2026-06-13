@@ -31,6 +31,21 @@ html[lang="zh-Hans"] {
   --body: "Hanken Grotesk", "Noto Sans SC", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+/* Italic reads poorly in CJK (no true italic — the browser fakes a slant), so
+   the hero's emphasized word gets a brand-blue wavy underline here instead of
+   the gradient italic the English page uses. */
+html[lang="zh-Hans"] .hero h1 em {
+  font-style: normal;
+  background: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  -webkit-text-fill-color: currentColor;
+  color: var(--violet-deep);
+  text-decoration: underline wavy var(--violet);
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.12em;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
