@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Markdown tables in results now render as a bordered grid instead of raw
+  `| --- |` pipe-and-dash text. All other output stays as plain, selectable,
+  copyable text.
+
+### Changed
+
+- Translation, polish, and summarize now preserve the source structure
+  (line breaks, lists, headings) in their results.
+
 ## [0.1.9] - 2026-06-13
 
 ### Added

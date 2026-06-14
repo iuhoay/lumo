@@ -172,9 +172,7 @@ struct TranslationView: View {
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
             } else {
-                Text(model.output)
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                MarkdownResultText(text: model.output)
             }
         }
     }
