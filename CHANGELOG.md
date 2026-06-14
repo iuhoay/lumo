@@ -9,12 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Keyboard-first translation window: ⌘1 / ⌘2 / ⌘3 switch between Translate,
+  Polish, and Summary, and ⌘R regenerates the current result. Each mode segment
+  shows its shortcut hint.
 - Markdown tables in results now render as a bordered grid instead of raw
   `| --- |` pipe-and-dash text. All other output stays as plain, selectable,
   copyable text.
 
 ### Changed
 
+- The translation window's action button is now labelled "Run" (it runs the
+  selected mode) instead of always "Translate", and the "Summarize" mode is now
+  labelled "Summary".
 - Translation, polish, and summarize now preserve the source structure
   (line breaks, lists, headings) in their results.
 

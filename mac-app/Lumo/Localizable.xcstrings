@@ -311,6 +311,26 @@
         }
       }
     },
+    "Run" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "执行"
+          }
+        }
+      }
+    },
+    "Run (⌘↵)" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "执行（⌘↵）"
+          }
+        }
+      }
+    },
     "Search source or result" : {
       "localizations" : {
         "zh-Hans" : {

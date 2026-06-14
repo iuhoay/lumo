@@ -6,13 +6,15 @@ enum TranslationMode: String, CaseIterable, Identifiable {
     case polish
     case summarize
 
-    var id: String { rawValue }
+    var id: String {
+        rawValue
+    }
 
     var title: String {
         switch self {
         case .translate: return String(localized: "Translate")
         case .polish: return String(localized: "Polish")
-        case .summarize: return String(localized: "Summarize")
+        case .summarize: return String(localized: "Summary")
         }
     }
 
