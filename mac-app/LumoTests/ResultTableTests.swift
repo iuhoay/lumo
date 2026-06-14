@@ -88,3 +88,54 @@ struct ResultSegmentParsingTests {
         #expect(segments[0] == .text(input))
     }
 }
+
+struct SpokenTextTests {
+    @Test func plainTextIsUnchanged() {
+        #expect(ResultSegment.spokenText("Just a sentence.") == "Just a sentence.")
+    }
+
+    @Test func stripsInlineEmphasisCodeAndStrikethrough() {
+        #expect(ResultSegment.spokenText("**bold** and *italic* and `code` and ~~gone~~")
+            == "bold and italic and code and gone")
+    }
+
+    @Test func unwrapsLinksAndImagesToTheirLabel() {
+        #expect(ResultSegment.spokenText("See [the docs](https://example.com/x) now")
+            == "See the docs now")
+        #expect(ResultSegment.spokenText("![a diagram](img.png)") == "a diagram")
+    }
+
+    @Test func stripsLeadingBlockMarkers() {
+        #expect(ResultSegment.spokenText("# Heading") == "Heading")
+        #expect(ResultSegment.spokenText("- bullet item") == "bullet item")
+        #expect(ResultSegment.spokenText("1. ordered item") == "ordered item")
+        #expect(ResultSegment.spokenText("> quoted line") == "quoted line")
+    }
+
+    @Test func dropsThematicBreaks() {
+        #expect(ResultSegment.spokenText("Above\n\n---\n\nBelow") == "Above\n\n\nBelow")
+    }
+
+    @Test func tableBecomesCommaSeparatedCellsWithoutPipesOrDelimiter() {
+        let input = """
+        | Plan | Price |
+        | --- | ---: |
+        | Free | $0 |
+        | Pro | $10 |
+        """
+        let spoken = ResultSegment.spokenText(input)
+
+        #expect(!spoken.contains("|"))
+        #expect(!spoken.contains("---"))
+        #expect(spoken == "Plan, Price. Free, $0. Pro, $10")
+    }
+
+    @Test func tableCellMarkersAreAlsoStripped() {
+        let input = "| **Plan** | Price |\n| - | - |\n| Free | `$0` |"
+        let spoken = ResultSegment.spokenText(input)
+
+        #expect(!spoken.contains("*"))
+        #expect(!spoken.contains("`"))
+        #expect(spoken == "Plan, Price. Free, $0")
+    }
+}
