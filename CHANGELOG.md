@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Keyboard-first translation window: ⌘1 / ⌘2 / ⌘3 switch between Translate,
   Polish, and Summary, and ⌘R regenerates the current result. Each mode segment
   shows its shortcut hint.
+- ⌘Y opens the translation history and ⌘P pins/unpins the window, matching the
+  toolbar buttons; both shortcuts are shown in the buttons' tooltips.
 - Markdown tables in results now render as a bordered grid instead of raw
   `| --- |` pipe-and-dash text. All other output stays as plain, selectable,
   copyable text.
