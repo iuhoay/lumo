@@ -130,6 +130,16 @@ struct TranslationModeSystemPromptTests {
         #expect(prompt.contains("English"))
     }
 
+    @Test("All mode prompts preserve structured formatting", arguments: TranslationMode.allCases)
+    func promptsPreserveStructuredFormatting(mode: TranslationMode) {
+        let prompt = mode.systemPrompt(target: "Simplified Chinese")
+
+        #expect(prompt.localizedCaseInsensitiveContains("paragraph breaks"))
+        #expect(prompt.localizedCaseInsensitiveContains("bullet"))
+        #expect(prompt.localizedCaseInsensitiveContains("Markdown"))
+        #expect(prompt.localizedCaseInsensitiveContains("single paragraph"))
+    }
+
     @Test("Summarize prompt states a summarization intent")
     func summarizeIntent() {
         let prompt = TranslationMode.summarize.systemPrompt(target: "English")
