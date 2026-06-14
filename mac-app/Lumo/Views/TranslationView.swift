@@ -28,11 +28,14 @@ struct TranslationView: View {
 
             HStack {
                 Spacer()
-                Button("Translate") { model.translate() }
+                // Mode-agnostic label: ⌘↵ runs the selected action (translate /
+                // polish / summarize), so a fixed "Run" stays correct in every
+                // mode. The current mode is shown by the picker and result label.
+                Button("Run") { model.translate() }
                     .buttonStyle(.bordered)
                     .keyboardShortcut(.return, modifiers: .command)
                     .disabled(translateDisabled)
-                    .help("Translate (⌘↵)")
+                    .help("Run (⌘↵)")
             }
 
             Divider()
@@ -54,13 +57,22 @@ struct TranslationView: View {
         }
         .padding(16)
         // minWidth must fit the header toolbar (fixed-size segmented picker +
-        // history/pin/close icons, ~416pt). NSHostingController sizes the window
-        // to this minWidth, so anything narrower clips the trailing buttons past
-        // the rounded-glass mask, making them unclickable.
+        // history/pin/close icons). The segments carry " ⌘1/⌘2/⌘3" hints, so the
+        // picker is wider than its bare titles — at 440 the toolbar still leaves a
+        // small trailing margin (this is why "Summarize" was shortened to
+        // "Summary"). NSHostingController sizes the window to this minWidth, so
+        // anything narrower clips the trailing buttons past the rounded-glass mask,
+        // making them unclickable. Keep window.minSize in TranslationWindowController
+        // in sync with this value.
         .frame(minWidth: 440, maxWidth: .infinity, minHeight: 300, maxHeight: .infinity, alignment: .topLeading)
         // Liquid Glass: the whole popup is a single floating glass slab over the
         // desktop. Controls inside stay flat (borderless) to avoid glass-on-glass.
         .glassEffect(in: RoundedRectangle(cornerRadius: GlassPanelMetrics.cornerRadius, style: .continuous))
+        // Command-key shortcuts that the visible controls can't carry: ⌘1/⌘2/⌘3
+        // (the segmented Picker has no per-segment shortcut hook) and ⌘R (kept
+        // chromeless by choice). Hidden buttons stay in the hierarchy, so the
+        // shortcuts fire even while the TextEditor holds focus.
+        .background(keyboardShortcuts)
         // Focus the input when the panel first appears and whenever it's reopened
         // (the hosting view is reused, so onAppear alone fires only once). Defer
         // to the next runloop tick: setting @FocusState synchronously during
@@ -96,8 +108,12 @@ struct TranslationView: View {
                 get: { model.mode },
                 set: { model.setMode($0) }
             )) {
-                ForEach(TranslationMode.allCases) { mode in
-                    Label(mode.title, systemImage: mode.symbol).tag(mode)
+                // Append the ⌘-number hint to each segment so the shortcut is
+                // self-documenting — a segmented Picker can't host a per-segment
+                // .help(...). The number is the 1-based position in allCases,
+                // which is exactly what `keyboardShortcuts` binds ⌘1/⌘2/⌘3 to.
+                ForEach(Array(TranslationMode.allCases.enumerated()), id: \.element.id) { index, mode in
+                    Label("\(mode.title) ⌘\(index + 1)", systemImage: mode.symbol).tag(mode)
                 }
             }
             .labelsHidden()
@@ -122,6 +138,24 @@ struct TranslationView: View {
             .help("Close (Esc)")
         }
         .buttonStyle(IconButtonStyle())
+    }
+
+    /// Off-screen buttons that own the window's command-key shortcuts. ⌘1/⌘2/⌘3
+    /// switch mode by position in `allCases` (matching the hints in the picker
+    /// segments); ⌘R re-runs the current mode. `.hidden()` keeps them in the
+    /// view tree — required for the shortcuts to register — without drawing.
+    /// ⌘R reuses `translateDisabled`, so it's inert on empty input or mid-stream.
+    private var keyboardShortcuts: some View {
+        Group {
+            ForEach(Array(TranslationMode.allCases.enumerated()), id: \.element.id) { index, mode in
+                Button("") { model.setMode(mode) }
+                    .keyboardShortcut(KeyEquivalent(Character("\(index + 1)")), modifiers: .command)
+            }
+            Button("") { model.translate() }
+                .keyboardShortcut("r", modifiers: .command)
+                .disabled(translateDisabled)
+        }
+        .hidden()
     }
 
     /// Editable "Original" field — bare text on the glass (no fill or border), so
