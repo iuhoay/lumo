@@ -125,12 +125,17 @@ struct TranslationView: View {
             Button { HistoryWindowController.shared.toggle() } label: {
                 Image(systemName: "clock.arrow.circlepath")
             }
-            .help("Translation History")
+            // ⌘Y is the de-facto macOS history shortcut (Safari, Finder). Like
+            // the Run button, this visible control carries its shortcut directly
+            // and still fires while the TextEditor holds focus.
+            .keyboardShortcut("y", modifiers: .command)
+            .help("Translation History (⌘Y)")
 
             Button { model.togglePin() } label: {
                 Image(systemName: model.isPinned ? "pin.fill" : "pin")
             }
-            .help("Pin window")
+            .keyboardShortcut("p", modifiers: .command)
+            .help(model.isPinned ? "Unpin window (⌘P)" : "Pin window (⌘P)")
 
             Button { model.dismiss() } label: {
                 Image(systemName: "xmark")

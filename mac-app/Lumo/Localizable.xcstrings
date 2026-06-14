@@ -231,12 +231,12 @@
         }
       }
     },
-    "Pin window" : {
+    "Pin window (⌘P)" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "置顶窗口"
+            "value" : "置顶窗口（⌘P）"
           }
         }
       }
@@ -511,12 +511,32 @@
         }
       }
     },
+    "Translation History (⌘Y)" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻译历史（⌘Y）"
+          }
+        }
+      }
+    },
     "Translation History…" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "翻译历史…"
+          }
+        }
+      }
+    },
+    "Unpin window (⌘P)" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消置顶（⌘P）"
           }
         }
       }
