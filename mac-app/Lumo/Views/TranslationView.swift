@@ -21,7 +21,7 @@ struct TranslationView: View {
 
             HStack {
                 sectionLabel("Original")
-                speakButton(model.inputText, source: .input)
+                speakButton(ResultSegment.spokenText(model.inputText), source: .input)
                 Spacer()
             }
             inputField
@@ -44,7 +44,7 @@ struct TranslationView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                speakButton(model.output, source: .result)
+                speakButton(ResultSegment.spokenText(model.output), source: .result)
                 copyButton
                 Spacer()
                 if model.isLoading { ProgressView().controlSize(.small) }

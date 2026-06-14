@@ -1,3 +1,4 @@
+import Foundation
 import SwiftUI
 
 /// Renders a result as raw, selectable text — exactly what the model produced,
@@ -168,6 +169,121 @@ enum ResultSegment: Equatable {
             aligns = Array(aligns.prefix(columnCount))
         }
         return aligns
+    }
+}
+
+// MARK: - Speech
+
+extension ResultSegment {
+    /// A speech-friendly plain-text rendering of raw model output. Tables become
+    /// comma-separated cells (the `| --- |` delimiter row is already dropped by
+    /// `parse`), and inline/block markdown markers (`**`, `*`, `` ` ``, `~~`,
+    /// leading `#`, `>`, list bullets, link URLs, fences, thematic breaks) are
+    /// stripped so the synthesizer reads prose instead of "asterisk" or
+    /// "vertical bar". Plain text without markup is returned unchanged.
+    static func spokenText(_ raw: String) -> String {
+        parse(raw)
+            .map { segment in
+                switch segment {
+                case let .text(text): return spokenParagraphs(text)
+                case let .table(table): return spokenTable(table)
+                }
+            }
+            .filter { !$0.isEmpty }
+            .joined(separator: "\n")
+    }
+
+    private static func spokenTable(_ table: MarkdownTable) -> String {
+        ([table.header] + table.rows)
+            .map { row in
+                row.map { stripInlineMarkers($0).trimmingCharacters(in: .whitespaces) }
+                    .filter { !$0.isEmpty }
+                    .joined(separator: ", ")
+            }
+            .filter { !$0.isEmpty }
+            .joined(separator: ". ")
+    }
+
+    private static func spokenParagraphs(_ text: String) -> String {
+        var lines: [String] = []
+        var inFence = false
+        for rawLine in text.components(separatedBy: "\n") {
+            let trimmed = rawLine.trimmingCharacters(in: .whitespaces)
+            if trimmed.hasPrefix("```") || trimmed.hasPrefix("~~~") {
+                inFence.toggle()
+                continue
+            }
+            if inFence {
+                lines.append(rawLine) // speak code body verbatim, without the fence
+                continue
+            }
+            if isThematicBreak(trimmed) { continue }
+            lines.append(stripInlineMarkers(stripBlockPrefix(rawLine)))
+        }
+        return lines.joined(separator: "\n")
+    }
+
+    private static func isThematicBreak(_ trimmed: String) -> Bool {
+        guard trimmed.count >= 3 else { return false }
+        let chars = Set(trimmed.filter { $0 != " " })
+        return chars.count == 1 && (chars == ["-"] || chars == ["*"] || chars == ["_"])
+    }
+
+    /// Drops a single leading block marker: heading `#`s, blockquote `>`s, or an
+    /// unordered/ordered list bullet. Content is preserved.
+    private static func stripBlockPrefix(_ line: String) -> String {
+        var s = Substring(line)
+        while s.first == " " || s.first == "\t" { s = s.dropFirst() }
+
+        while s.first == ">" {
+            s = s.dropFirst()
+            while s.first == " " { s = s.dropFirst() }
+        }
+
+        let hashes = s.prefix(while: { $0 == "#" })
+        if (1 ... 6).contains(hashes.count), s.dropFirst(hashes.count).first == " " {
+            s = s.dropFirst(hashes.count)
+            while s.first == " " { s = s.dropFirst() }
+            return String(s)
+        }
+
+        if let marker = s.first, marker == "-" || marker == "*" || marker == "+",
+           s.dropFirst().first == " " {
+            s = s.dropFirst(2)
+            while s.first == " " { s = s.dropFirst() }
+            return String(s)
+        }
+
+        let digits = s.prefix(while: { $0.isNumber })
+        if !digits.isEmpty {
+            let afterDigits = s.dropFirst(digits.count)
+            if let sep = afterDigits.first, sep == "." || sep == ")",
+               afterDigits.dropFirst().first == " " {
+                s = afterDigits.dropFirst(2)
+                while s.first == " " { s = s.dropFirst() }
+                return String(s)
+            }
+        }
+        return String(s)
+    }
+
+    /// Unwraps `[text](url)` / `![alt](url)` to their label and removes emphasis,
+    /// code, and strikethrough markers. A single `_` is left alone so identifiers
+    /// like `snake_case` aren't merged.
+    private static func stripInlineMarkers(_ text: String) -> String {
+        var result = unwrapLinks(text)
+        for marker in ["**", "__", "~~", "*", "`"] {
+            result = result.replacingOccurrences(of: marker, with: "")
+        }
+        return result
+    }
+
+    private static let linkPattern = try? NSRegularExpression(pattern: #"!?\[([^\]]*)\]\([^)]*\)"#)
+
+    private static func unwrapLinks(_ text: String) -> String {
+        guard let linkPattern else { return text }
+        let range = NSRange(text.startIndex..., in: text)
+        return linkPattern.stringByReplacingMatches(in: text, range: range, withTemplate: "$1")
     }
 }
 
