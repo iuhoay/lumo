@@ -5,7 +5,7 @@ All notable changes to Lumo are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.0] - 2026-06-15
 
 ### Added
 
@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Markdown tables in results now render as a bordered grid instead of raw
   `| --- |` pipe-and-dash text. All other output stays as plain, selectable,
   copyable text.
+- The translation window now grows to fit the result — up to 85% of the
+  screen — and only scrolls past that, so short answers no longer leave empty
+  space and long ones stay readable. The window animates as the result streams
+  in and settles to an exact fit once it finishes.
 
 ### Changed
 
@@ -25,6 +29,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   labelled "Summary".
 - Translation, polish, and summarize now preserve the source structure
   (line breaks, lists, headings) in their results.
+
+### Fixed
+
+- Text-to-speech no longer reads markdown markers and table pipes aloud
+  (`*`, `#`, `|`, and similar symbols are stripped before speaking).
 
 ## [0.1.9] - 2026-06-13
 
