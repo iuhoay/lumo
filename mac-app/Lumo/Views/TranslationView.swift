@@ -4,6 +4,7 @@ import SwiftUI
 /// The contents of the floating translation window.
 struct TranslationView: View {
     @EnvironmentObject private var model: AppModel
+    @ObservedObject private var sizing: TranslationSizing
     @ObservedObject private var speaker = Speaker.shared
     @FocusState private var inputFocused: Bool
     /// Whether the clipboard currently holds text — gates the empty window's
@@ -14,8 +15,60 @@ struct TranslationView: View {
     /// Bumped on every copy so the checkmark-reset task restarts even when
     /// `didCopy` is already true (rapid re-copies keep the confirmation fresh).
     @State private var copyToken = 0
+    /// Natural (unclamped) height of the result content, measured inside the
+    /// scroll view. Drives the self-sizing result box and, through it, the
+    /// window's grow-to-fit height.
+    @State private var resultContentHeight: CGFloat = 0
+
+    init(sizing: TranslationSizing) {
+        self.sizing = sizing
+    }
 
     var body: some View {
+        content
+            .padding(16)
+            // Measure the content's NATURAL height here, before the fill frame
+            // below stretches it to the window, and report it up so the controller
+            // can size the window to fit. `onGeometryChange` reads this view's own
+            // laid-out height directly; the older `.background(GeometryReader →
+            // preference)` trick collapsed to 0 inside the result ScrollView and
+            // never updated as tokens streamed.
+            .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { sizing.onHeight?($0) }
+            // minWidth must fit the header toolbar (fixed-size segmented picker +
+            // history/pin/close icons). The segments carry " ⌘1/⌘2/⌘3" hints, so the
+            // picker is wider than its bare titles — at 440 the toolbar still leaves a
+            // small trailing margin (this is why "Summarize" was shortened to
+            // "Summary"). NSHostingController sizes the window to this minWidth, so
+            // anything narrower clips the trailing buttons past the rounded-glass mask,
+            // making them unclickable. Keep window.minSize in TranslationWindowController
+            // in sync with this value.
+            .frame(minWidth: 440, maxWidth: .infinity, minHeight: 300, maxHeight: .infinity, alignment: .topLeading)
+            // Liquid Glass: the whole popup is a single floating glass slab over the
+            // desktop. Controls inside stay flat (borderless) to avoid glass-on-glass.
+            .glassEffect(in: RoundedRectangle(cornerRadius: GlassPanelMetrics.cornerRadius, style: .continuous))
+            // Command-key shortcuts that the visible controls can't carry: ⌘1/⌘2/⌘3
+            // (the segmented Picker has no per-segment shortcut hook) and ⌘R (kept
+            // chromeless by choice). Hidden buttons stay in the hierarchy, so the
+            // shortcuts fire even while the TextEditor holds focus.
+            .background(keyboardShortcuts)
+            // Streaming edge: let the controller settle to an exact fit once a
+            // grow-only stream finishes.
+            .onChange(of: model.isLoading) { _, loading in sizing.onStreaming?(loading) }
+            // Focus the input when the panel first appears and whenever it's reopened
+            // (the hosting view is reused, so onAppear alone fires only once). Defer
+            // to the next runloop tick: setting @FocusState synchronously during
+            // window presentation races AppKit's initial first-responder assignment
+            // and loses, leaving the focus ring on a toolbar button instead.
+            .onAppear { onPresent() }
+            .onChange(of: model.focusInputToken) { _, _ in onPresent() }
+            // Catch a clipboard change made while the empty window stayed open: the
+            // panel re-activates when the user comes back to it, so refresh the hint.
+            .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+                refreshClipboardHint()
+            }
+    }
+
+    private var content: some View {
         VStack(alignment: .leading, spacing: 8) {
             header
 
@@ -54,36 +107,6 @@ struct TranslationView: View {
             }
 
             resultArea
-        }
-        .padding(16)
-        // minWidth must fit the header toolbar (fixed-size segmented picker +
-        // history/pin/close icons). The segments carry " ⌘1/⌘2/⌘3" hints, so the
-        // picker is wider than its bare titles — at 440 the toolbar still leaves a
-        // small trailing margin (this is why "Summarize" was shortened to
-        // "Summary"). NSHostingController sizes the window to this minWidth, so
-        // anything narrower clips the trailing buttons past the rounded-glass mask,
-        // making them unclickable. Keep window.minSize in TranslationWindowController
-        // in sync with this value.
-        .frame(minWidth: 440, maxWidth: .infinity, minHeight: 300, maxHeight: .infinity, alignment: .topLeading)
-        // Liquid Glass: the whole popup is a single floating glass slab over the
-        // desktop. Controls inside stay flat (borderless) to avoid glass-on-glass.
-        .glassEffect(in: RoundedRectangle(cornerRadius: GlassPanelMetrics.cornerRadius, style: .continuous))
-        // Command-key shortcuts that the visible controls can't carry: ⌘1/⌘2/⌘3
-        // (the segmented Picker has no per-segment shortcut hook) and ⌘R (kept
-        // chromeless by choice). Hidden buttons stay in the hierarchy, so the
-        // shortcuts fire even while the TextEditor holds focus.
-        .background(keyboardShortcuts)
-        // Focus the input when the panel first appears and whenever it's reopened
-        // (the hosting view is reused, so onAppear alone fires only once). Defer
-        // to the next runloop tick: setting @FocusState synchronously during
-        // window presentation races AppKit's initial first-responder assignment
-        // and loses, leaving the focus ring on a toolbar button instead.
-        .onAppear { onPresent() }
-        .onChange(of: model.focusInputToken) { _, _ in onPresent() }
-        // Catch a clipboard change made while the empty window stayed open: the
-        // panel re-activates when the user comes back to it, so refresh the hint.
-        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
-            refreshClipboardHint()
         }
     }
 
@@ -191,28 +214,51 @@ struct TranslationView: View {
             .padding(.leading, -5)
     }
 
+    /// The result box self-sizes to its content (`resultContentHeight`, measured
+    /// inside the scroll view) up to the per-screen cap, then scrolls past it.
+    /// The window follows this height, so short results don't leave dead space and
+    /// long ones grow the window instead of scrolling inside a small box.
     private var resultArea: some View {
         ScrollView {
-            if let errorText = model.errorText {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(errorText)
-                        .foregroundStyle(.red)
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    if let destination = model.errorSettingsDestination {
-                        Button(settingsButtonTitle(for: destination)) {
-                            openSettings(destination)
-                        }
-                        .controlSize(.small)
-                    }
-                }
-            } else if model.output.isEmpty && model.isLoading {
-                Text("Translating…")
-                    .foregroundStyle(.secondary)
+            resultBody
+                .frame(maxWidth: .infinity, alignment: .leading)
+                // Measure the result's natural height directly. Feeds `resultBoxHeight`,
+                // which sizes this box to fit until the per-screen cap, then scrolls.
+                .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { resultContentHeight = $0 }
+        }
+        .frame(height: resultBoxHeight)
+    }
+
+    /// Clamp the measured content height to the per-screen cap. The small floor
+    /// keeps an empty/just-opened window from collapsing the box to nothing before
+    /// the first measurement arrives.
+    private var resultBoxHeight: CGFloat {
+        let floorHeight: CGFloat = 56
+        let natural = max(resultContentHeight, floorHeight)
+        return min(natural, sizing.maxResultHeight)
+    }
+
+    @ViewBuilder
+    private var resultBody: some View {
+        if let errorText = model.errorText {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(errorText)
+                    .foregroundStyle(.red)
+                    .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)
-            } else {
-                MarkdownResultText(text: model.output)
+                if let destination = model.errorSettingsDestination {
+                    Button(settingsButtonTitle(for: destination)) {
+                        openSettings(destination)
+                    }
+                    .controlSize(.small)
+                }
             }
+        } else if model.output.isEmpty && model.isLoading {
+            Text("Translating…")
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            MarkdownResultText(text: model.output)
         }
     }
 
