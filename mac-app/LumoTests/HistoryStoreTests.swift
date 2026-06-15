@@ -185,3 +185,101 @@ struct HistoryStoreTests {
         #expect(stored.provider == .openAI)
     }
 }
+
+/// A throwaway @Model standing in for *another* non-sandboxed app's SwiftData
+/// store, used to prove the rescue refuses to import from a foreign schema.
+@Model
+final class ForeignRecord {
+    var label: String
+    init(label: String) {
+        self.label = label
+    }
+}
+
+@Suite("Legacy shared-store rescue")
+struct LegacyStoreRescueTests {
+    @MainActor
+    private func tempStoreURL() -> URL {
+        FileManager.default.temporaryDirectory
+            .appending(path: UUID().uuidString, directoryHint: .isDirectory)
+            .appending(path: "default.store")
+    }
+
+    /// Returns the container (not just its context): a `ModelContext` does not
+    /// retain its `ModelContainer`, so the caller must hold the container for the
+    /// test's lifetime or the context dangles.
+    @MainActor
+    private func inMemoryContainer() throws -> ModelContainer {
+        try ModelContainer(
+            for: HistoryItem.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+    }
+
+    /// A file-backed HistoryItem store (the shape the real legacy store has) is
+    /// imported row-for-row into the fresh store.
+    @Test @MainActor
+    func importsHistoryFromMatchingLegacyStore() throws {
+        let legacyURL = tempStoreURL()
+        try FileManager.default.createDirectory(
+            at: legacyURL.deletingLastPathComponent(), withIntermediateDirectories: true
+        )
+
+        // Seed the legacy store on disk.
+        let legacy = try ModelContainer(
+            for: HistoryItem.self,
+            configurations: ModelConfiguration(url: legacyURL)
+        )
+        for i in 0 ..< 2 {
+            legacy.mainContext.insert(
+                HistoryItem(
+                    mode: .translate, sourceText: "src-\(i)", outputText: "out-\(i)",
+                    target: "English", provider: .openAI, model: "m"
+                )
+            )
+        }
+        try legacy.mainContext.save()
+
+        let destination = try inMemoryContainer()
+        let imported = HistoryStore.importLegacyHistory(from: legacyURL, into: destination.mainContext)
+
+        #expect(imported == 2)
+        let fetched = try destination.mainContext.fetch(FetchDescriptor<HistoryItem>())
+        #expect(Set(fetched.map(\.sourceText)) == ["src-0", "src-1"])
+
+        // Non-destructive: the legacy file is left in place.
+        #expect(FileManager.default.fileExists(atPath: legacyURL.path))
+    }
+
+    /// A store owned by a *different* app (different entity) must be left
+    /// untouched — nothing imported, no crash.
+    @Test @MainActor
+    func skipsForeignSchemaStore() throws {
+        let legacyURL = tempStoreURL()
+        try FileManager.default.createDirectory(
+            at: legacyURL.deletingLastPathComponent(), withIntermediateDirectories: true
+        )
+
+        let foreign = try ModelContainer(
+            for: ForeignRecord.self,
+            configurations: ModelConfiguration(url: legacyURL)
+        )
+        foreign.mainContext.insert(ForeignRecord(label: "not ours"))
+        try foreign.mainContext.save()
+
+        let destination = try inMemoryContainer()
+        let imported = HistoryStore.importLegacyHistory(from: legacyURL, into: destination.mainContext)
+
+        #expect(imported == 0)
+        #expect(try destination.mainContext.fetch(FetchDescriptor<HistoryItem>()).isEmpty)
+    }
+
+    /// No legacy file at all is a clean no-op.
+    @Test @MainActor
+    func noOpWhenLegacyStoreMissing() throws {
+        let destination = try inMemoryContainer()
+        let imported = HistoryStore.importLegacyHistory(from: tempStoreURL(), into: destination.mainContext)
+        #expect(imported == 0)
+        #expect(try destination.mainContext.fetch(FetchDescriptor<HistoryItem>()).isEmpty)
+    }
+}

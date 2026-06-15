@@ -5,6 +5,15 @@ All notable changes to Lumo are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Translation history could disappear: the database was stored at a shared
+  system location that any other app could overwrite. History now lives in
+  Lumo's own folder, and any history still present from the old location is
+  carried over automatically on first launch after updating.
+
 ## [0.2.0] - 2026-06-15
 
 ### Added
