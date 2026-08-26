@@ -14,6 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Settings: Thinking Off / On (default Off) for OpenAI and OpenAI-compatible
   providers. Off disables chain-of-thought on hybrid models such as Qwen 3/3.5
   via Ollama, so translations no longer stall on a reasoning trace.
+- Translation window: a compact destination menu on the result row. Change it
+  for this request only — Settings defaults stay put.
+
+### Changed
+
+- Translate routing no longer assumes a native language. Any input goes to the
+  default target; input already in that target flips to the flip-back language.
+  A third language (e.g. Japanese when the pair is Chinese/English) now goes to
+  the target instead of being sent "home".
 
 ## [0.2.1] - 2026-06-15
 

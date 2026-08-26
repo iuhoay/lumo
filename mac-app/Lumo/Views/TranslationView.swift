@@ -93,12 +93,11 @@ struct TranslationView: View {
 
             Divider()
 
-            HStack {
-                sectionLabel(resultLabel)
+            HStack(spacing: 4) {
                 if !model.resolvedTarget.isEmpty, model.mode != .polish {
-                    Text("· \(model.resolvedTarget)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    DestinationPicker(destination: model.resolvedTarget) {
+                        model.setDestination($0)
+                    }
                 }
                 speakButton(ResultSegment.spokenText(model.output), source: .result)
                 copyButton
@@ -264,14 +263,6 @@ struct TranslationView: View {
 
     private var translateDisabled: Bool {
         model.isLoading || model.inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-
-    private var resultLabel: LocalizedStringKey {
-        switch model.mode {
-        case .summarize: return "Summary"
-        case .polish: return "Polished"
-        case .translate: return "Translation"
-        }
     }
 
     private func settingsButtonTitle(for destination: ErrorSettingsDestination) -> LocalizedStringKey {

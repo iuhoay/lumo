@@ -15,6 +15,9 @@ final class AppModel: ObservableObject {
     @Published var mode: TranslationMode = .translate
     @Published var output: String = ""
     @Published var resolvedTarget: String = ""
+    /// When true, `resolvedTarget` is a per-window override and `translate()`
+    /// must not replace it with a freshly detected destination.
+    private var destinationOverridden = false
     @Published var isLoading: Bool = false
     @Published var isCapturingScreenText: Bool = false
     @Published var errorText: String?
@@ -48,6 +51,7 @@ final class AppModel: ObservableObject {
         windowController.present()
         // Put focus in the editable input (so it's ready to tweak/re-translate)
         // rather than letting a toolbar button take keyboard focus + focus ring.
+        destinationOverridden = false
         focusInputToken &+= 1
         translate()
     }
@@ -60,7 +64,8 @@ final class AppModel: ObservableObject {
         output = ""
         errorText = nil
         errorSettingsDestination = nil
-        resolvedTarget = ""
+        destinationOverridden = false
+        resolvedTarget = AppSettings.shared.targetLanguage
         isLoading = false
         windowController.present()
         focusInputToken &+= 1
@@ -108,7 +113,9 @@ final class AppModel: ObservableObject {
             output = ""
             errorText = nil
             errorSettingsDestination = nil
-            resolvedTarget = ""
+            if !destinationOverridden {
+                resolvedTarget = AppSettings.shared.targetLanguage
+            }
             isLoading = false
             return
         }
@@ -119,10 +126,11 @@ final class AppModel: ObservableObject {
 
         let settings = AppSettings.shared
         let mode = self.mode
-        let target = LanguageDetector.target(
-            for: text,
-            whenChinese: settings.targetWhenChinese,
-            otherwise: settings.targetWhenOther
+        let target = LanguageDetector.resolvedDestination(
+            text: text,
+            target: settings.targetLanguage,
+            fallback: settings.nativeLanguage,
+            override: destinationOverridden ? resolvedTarget : nil
         )
         resolvedTarget = target
         // The on-device provider has no configurable model name; label it so
@@ -177,6 +185,20 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// Override the destination for this window. Re-run only when a translation
+    /// is already on screen (a result or an error) or in flight — same gate as
+    /// `setMode`. Does not write back to Settings.
+    func setDestination(_ newDestination: String) {
+        let trimmed = newDestination.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        let changed = trimmed != resolvedTarget
+        resolvedTarget = trimmed
+        destinationOverridden = true
+        if changed && (isLoading || !output.isEmpty || errorText != nil) {
+            translate()
+        }
+    }
+
     private func handleOCRSelection(_ result: OCRSelectionResult) async {
         switch result {
         case .cancelled:
@@ -204,6 +226,7 @@ final class AppModel: ObservableObject {
         task?.cancel()
         inputText = ""
         output = ""
+        destinationOverridden = false
         resolvedTarget = ""
         isLoading = false
         errorText = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription

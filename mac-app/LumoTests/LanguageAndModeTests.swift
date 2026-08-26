@@ -1,4 +1,5 @@
 import Foundation
+import NaturalLanguage
 import Testing
 @testable import Lumo
 
@@ -46,46 +47,192 @@ struct LanguageDetectorIsChineseTests {
     }
 }
 
-// MARK: - LanguageDetector.target(for:whenChinese:otherwise:)
+// MARK: - LanguageDetector.destination(for:target:fallback:)
 
-@Suite("LanguageDetector.target branch selection")
-struct LanguageDetectorTargetTests {
-    @Test("Chinese input returns the whenChinese branch")
-    func chineseBranch() {
-        let result = LanguageDetector.target(
-            for: "这是中文输入内容，应当走中文分支。",
-            whenChinese: "English",
-            otherwise: "Simplified Chinese"
-        )
-        #expect(result == "English")
-    }
-
-    @Test("English input returns the otherwise branch")
-    func englishBranch() {
-        let result = LanguageDetector.target(
-            for: "This is English input and should take the otherwise branch.",
-            whenChinese: "English",
-            otherwise: "Simplified Chinese"
+@Suite("LanguageDetector.destination branch selection")
+struct LanguageDetectorDestinationTests {
+    @Test("Input already in the target flips to the fallback")
+    func alreadyTargetFlips() {
+        let result = LanguageDetector.destination(
+            for: "This is English input and should flip to the fallback language.",
+            target: "English",
+            fallback: "Simplified Chinese"
         )
         #expect(result == "Simplified Chinese")
     }
 
-    @Test("Branch labels are returned verbatim regardless of their content")
-    func arbitraryLabels() {
-        let chinese = LanguageDetector.target(
-            for: "完全是中文的一段话用于检测。",
-            whenChinese: "TARGET_CN",
-            otherwise: "TARGET_OTHER"
+    @Test("Input in any other language goes to the target")
+    func otherLanguageGoesToTarget() {
+        let result = LanguageDetector.destination(
+            for: "这是中文输入内容，应当翻译成目标语言。",
+            target: "English",
+            fallback: "Simplified Chinese"
         )
-        let english = LanguageDetector.target(
-            for: "Completely English sentence used for detection.",
-            whenChinese: "TARGET_CN",
-            otherwise: "TARGET_OTHER"
+        #expect(result == "English")
+    }
+
+    @Test("A third language still goes to the target, not the fallback")
+    func thirdLanguageGoesToTarget() {
+        let result = LanguageDetector.destination(
+            for: "これは日本語の入力です。",
+            target: "English",
+            fallback: "Simplified Chinese"
         )
-        #expect(chinese == "TARGET_CN")
-        #expect(english == "TARGET_OTHER")
+        #expect(result == "English")
+    }
+
+    @Test("Traditional Chinese input counts as already-in-target for Simplified Chinese")
+    func chineseFamilyCountsAsTarget() {
+        let result = LanguageDetector.destination(
+            for: "這是繁體中文輸入，目標已是中文时应当掉头。",
+            target: "Simplified Chinese",
+            fallback: "English"
+        )
+        #expect(result == "English")
+    }
+
+    @Test("A non-English target routes by its own detection")
+    func nonEnglishTarget() {
+        let japanese = LanguageDetector.destination(
+            for: "これは日本語の入力です。",
+            target: "Japanese",
+            fallback: "Simplified Chinese"
+        )
+        let english = LanguageDetector.destination(
+            for: "This is English input.",
+            target: "Japanese",
+            fallback: "Simplified Chinese"
+        )
+        #expect(japanese == "Simplified Chinese")
+        #expect(english == "Japanese")
+    }
+
+    @Test("An unmappable target never flips")
+    func unmappableTargetNeverFlips() {
+        // "Klingon" maps to no NLLanguage, so every input stays on target.
+        let chinese = LanguageDetector.destination(
+            for: "中文输入也无法检测目标语言。",
+            target: "Klingon",
+            fallback: "English"
+        )
+        let english = LanguageDetector.destination(
+            for: "English input cannot detect Klingon either.",
+            target: "Klingon",
+            fallback: "English"
+        )
+        #expect(chinese == "Klingon")
+        #expect(english == "Klingon")
+    }
+
+    @Test("An unmappable fallback is returned verbatim when flipping")
+    func unmappableFallbackReturnedVerbatim() {
+        let result = LanguageDetector.destination(
+            for: "This is English input and should flip to the fallback label.",
+            target: "English",
+            fallback: "Klingon"
+        )
+        #expect(result == "Klingon")
     }
 }
+
+// MARK: - LanguageDetector.resolvedDestination
+
+@Suite("LanguageDetector.resolvedDestination")
+struct LanguageDetectorResolvedDestinationTests {
+    @Test("A non-empty override wins over detection")
+    func overrideWins() {
+        let result = LanguageDetector.resolvedDestination(
+            text: "这是中文。",
+            target: "English",
+            fallback: "Simplified Chinese",
+            override: "Japanese"
+        )
+        #expect(result == "Japanese")
+    }
+
+    @Test("Blank override falls through to detection")
+    func blankOverrideFallsThrough() {
+        let result = LanguageDetector.resolvedDestination(
+            text: "这是中文。",
+            target: "English",
+            fallback: "Simplified Chinese",
+            override: "   "
+        )
+        #expect(result == "English")
+    }
+
+    @Test("Empty input prefills the default target")
+    func emptyInputPrefillsTarget() {
+        let result = LanguageDetector.resolvedDestination(
+            text: "",
+            target: "English",
+            fallback: "Simplified Chinese",
+            override: nil
+        )
+        #expect(result == "English")
+    }
+}
+
+// MARK: - LanguageDetector.languageCode(for:)
+
+@Suite("LanguageDetector.languageCode")
+struct LanguageDetectorLanguageCodeTests {
+    @Test("Preset names map to their NLLanguage", arguments: [
+        ("English", NLLanguage.english),
+        ("Simplified Chinese", NLLanguage.simplifiedChinese),
+        ("Traditional Chinese", NLLanguage.traditionalChinese),
+        ("Japanese", NLLanguage.japanese),
+        ("Korean", NLLanguage.korean),
+        ("French", NLLanguage.french),
+        ("German", NLLanguage.german),
+        ("Spanish", NLLanguage.spanish),
+        ("Portuguese", NLLanguage.portuguese),
+        ("Italian", NLLanguage.italian),
+        ("Russian", NLLanguage.russian),
+        ("Arabic", NLLanguage.arabic),
+    ] as [(String, NLLanguage)])
+    func presetMapping(name: String, language: NLLanguage) {
+        #expect(LanguageDetector.languageCode(for: name) == language)
+    }
+
+    @Test("Raw NLLanguage codes typed into the custom field are accepted")
+    func rawCodes() {
+        #expect(LanguageDetector.languageCode(for: "en") == .english)
+        #expect(LanguageDetector.languageCode(for: "zh-Hans") == .simplifiedChinese)
+        #expect(LanguageDetector.languageCode(for: "ja") == .japanese)
+    }
+
+    @Test("Unknown names return nil")
+    func unknownName() {
+        #expect(LanguageDetector.languageCode(for: "Klingon") == nil)
+        #expect(LanguageDetector.languageCode(for: "") == nil)
+    }
+}
+
+// MARK: - LanguageDetector.isInLanguage(_:_:)
+
+@Suite("LanguageDetector.isInLanguage")
+struct LanguageDetectorIsInLanguageTests {
+    @Test("Chinese text is in the Chinese language family")
+    func chineseFamily() {
+        #expect(LanguageDetector.isInLanguage("这是一段中文。", .simplifiedChinese))
+        #expect(LanguageDetector.isInLanguage("這是繁體中文。", .simplifiedChinese))
+        #expect(LanguageDetector.isInLanguage("這是繁體中文。", .traditionalChinese))
+    }
+
+    @Test("Non-Chinese text is not in the Chinese family")
+    func notChineseFamily() {
+        #expect(LanguageDetector.isInLanguage("This is English.", .simplifiedChinese) == false)
+    }
+
+    @Test("Text matches its own non-Chinese language")
+    func nonChineseMatch() {
+        #expect(LanguageDetector.isInLanguage("This is English text.", .english))
+        #expect(LanguageDetector.isInLanguage("これは日本語です。", .japanese))
+        #expect(LanguageDetector.isInLanguage("이것은 한국어입니다.", .korean))
+    }
+}
+
 
 // MARK: - TranslationMode.systemPrompt(target:)
 
