@@ -27,7 +27,7 @@ final class AppSettings: ObservableObject {
     }
 
     /// Thinking / chain-of-thought for OpenAI-compatible hosts (Ollama, Qwen).
-    /// `auto` omits the wire fields so the host keeps its default.
+    /// Off disables it; On omits the wire fields so the host keeps its default.
     @Published var thinking: ThinkingMode {
         didSet { defaults.set(thinking.rawValue, forKey: Keys.thinking) }
     }
@@ -44,7 +44,7 @@ final class AppSettings: ObservableObject {
         let provider = Provider(rawValue: defaults.string(forKey: Keys.provider) ?? "") ?? .openAICompatible
         self.provider = provider
         model = defaults.string(forKey: Keys.model) ?? "deepseek-v4-flash"
-        thinking = ThinkingMode(rawValue: defaults.string(forKey: Keys.thinking) ?? "") ?? .auto
+        thinking = ThinkingMode(rawValue: defaults.string(forKey: Keys.thinking) ?? "") ?? .off
         targetWhenChinese = defaults.string(forKey: Keys.targetWhenChinese) ?? "English"
         targetWhenOther = defaults.string(forKey: Keys.targetWhenOther) ?? "Simplified Chinese"
         // Resolve the current provider's base URL, migrating any pre-existing

@@ -134,7 +134,7 @@ final class AppModel: ObservableObject {
             model: modelName,
             system: mode.systemPrompt(target: target),
             user: text,
-            thinking: settings.provider.supportsThinkingControl ? settings.thinking : .auto
+            thinking: settings.provider.supportsThinkingControl ? settings.thinking : .on
         )
         let service = ServiceFactory.make(for: settings.provider)
 

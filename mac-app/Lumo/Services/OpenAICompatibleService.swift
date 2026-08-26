@@ -47,8 +47,8 @@ struct OpenAICompatibleService: TranslationService {
     }
 }
 
-/// JSON body for `/v1/chat/completions`. Thinking fields are omitted in
-/// `.auto` so hosts keep their default (Ollama: on for Qwen 3/3.5).
+/// JSON body for `/v1/chat/completions`. Off disables thinking; On omits the
+/// fields so the host keeps its default (Ollama: on for Qwen 3/3.5).
 func openAICompatibleRequestBody(_ request: ChatRequest) -> [String: Any] {
     var body: [String: Any] = [
         "model": request.model,
@@ -59,15 +59,9 @@ func openAICompatibleRequestBody(_ request: ChatRequest) -> [String: Any] {
         "temperature": 0.2,
         "stream": true
     ]
-    switch request.thinking {
-    case .auto:
-        break
-    case .off:
+    if request.thinking == .off {
         body["reasoning_effort"] = "none"
         body["think"] = false
-    case .on:
-        body["reasoning_effort"] = "high"
-        body["think"] = true
     }
     return body
 }

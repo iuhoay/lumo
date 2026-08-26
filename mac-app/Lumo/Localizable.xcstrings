@@ -21,16 +21,6 @@
         }
       }
     },
-    "Auto" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "自动"
-          }
-        }
-      }
-    },
     "Check for Updates…" : {
       "localizations" : {
         "zh-Hans" : {

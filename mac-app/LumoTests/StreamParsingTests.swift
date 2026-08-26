@@ -129,7 +129,7 @@ struct StreamParsingTests {
     /// Builds a `ChatRequest` matching the real struct's memberwise init.
     private func makeRequest(
         baseURL: String = "https://example.test",
-        thinking: ThinkingMode = .auto
+        thinking: ThinkingMode = .off
     ) -> ChatRequest {
         ChatRequest(
             baseURL: baseURL,
