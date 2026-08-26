@@ -21,6 +21,16 @@
         }
       }
     },
+    "Auto" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动"
+          }
+        }
+      }
+    },
     "Check for Updates…" : {
       "localizations" : {
         "zh-Hans" : {
@@ -581,6 +591,36 @@
         }
       }
     },
+    "Off" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭"
+          }
+        }
+      }
+    },
+    "Off disables thinking for Qwen and Ollama hybrid models. Ignored by models that don't support it." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭可禁用 Qwen 和 Ollama 混合模型的深度思考；不支持的模型会忽略此项。"
+          }
+        }
+      }
+    },
+    "On" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开启"
+          }
+        }
+      }
+    },
     "On-device model ready. No API key needed." : {
       "localizations" : {
         "zh-Hans" : {
@@ -607,6 +647,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "设备端模型当前不可用。"
+          }
+        }
+      }
+    },
+    "Thinking" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "深度思考"
           }
         }
       }

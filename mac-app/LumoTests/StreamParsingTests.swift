@@ -38,8 +38,15 @@ struct StreamParsingTests {
             queue.append(response)
         }
 
+        /// JSON body of the most recent intercepted request. Snapshotted in
+        /// `startLoading` because URLSession often puts the payload on
+        /// `httpBodyStream` and that stream is consumed by the time the test
+        /// resumes.
+        nonisolated(unsafe) static var lastJSONBody: [String: Any]?
+
         static func reset() {
             queue.removeAll()
+            lastJSONBody = nil
         }
 
         /// The host this suite's `ChatRequest`s target. Used to scope interception.
@@ -57,6 +64,7 @@ struct StreamParsingTests {
         }
 
         override func startLoading() {
+            Self.lastJSONBody = Self.readJSONBody(from: request)
             guard let client else { return }
 
             guard !Self.queue.isEmpty else {
@@ -83,6 +91,27 @@ struct StreamParsingTests {
         }
 
         override func stopLoading() {}
+
+        private static func readJSONBody(from request: URLRequest) -> [String: Any]? {
+            let data: Data
+            if let body = request.httpBody {
+                data = body
+            } else if let stream = request.httpBodyStream {
+                stream.open()
+                defer { stream.close() }
+                var collected = Data()
+                var buffer = [UInt8](repeating: 0, count: 4096)
+                while stream.hasBytesAvailable {
+                    let read = stream.read(&buffer, maxLength: buffer.count)
+                    guard read > 0 else { break }
+                    collected.append(buffer, count: read)
+                }
+                data = collected
+            } else {
+                return nil
+            }
+            return (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+        }
     }
 
     // MARK: - Suite lifecycle
@@ -98,13 +127,17 @@ struct StreamParsingTests {
     // MARK: - Helpers
 
     /// Builds a `ChatRequest` matching the real struct's memberwise init.
-    private func makeRequest(baseURL: String = "https://example.test") -> ChatRequest {
+    private func makeRequest(
+        baseURL: String = "https://example.test",
+        thinking: ThinkingMode = .auto
+    ) -> ChatRequest {
         ChatRequest(
             baseURL: baseURL,
             apiKey: "sk-test",
             model: "gpt-4o-mini",
             system: "You are a translation engine.",
-            user: "Hello"
+            user: "Hello",
+            thinking: thinking
         )
     }
 
@@ -222,6 +255,26 @@ struct StreamParsingTests {
             }
             return status == 401
         }
+    }
+
+    @Test
+    func openAIOffThinkingLandsOnTheWire() async throws {
+        StreamParsingURLProtocolStub.enqueue(
+            StreamParsingStubResponse(
+                statusCode: 200,
+                headers: ["Content-Type": "text/event-stream"],
+                chunks: [sseLine("data: [DONE]")]
+            )
+        )
+
+        let service = OpenAICompatibleService()
+        _ = try await collect(service.stream(makeRequest(thinking: .off)))
+
+        let json = try #require(StreamParsingURLProtocolStub.lastJSONBody)
+        #expect(json["reasoning_effort"] as? String == "none")
+        #expect(json["think"] as? Bool == false)
+        let messages = try #require(json["messages"] as? [[String: String]])
+        #expect(messages.last?["content"] == "Hello\n\n/no_think")
     }
 
     // MARK: - Anthropic

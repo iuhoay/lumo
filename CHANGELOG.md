@@ -5,6 +5,14 @@ All notable changes to Lumo are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Settings: Thinking Auto / Off / On for OpenAI and OpenAI-compatible
+  providers. Off disables chain-of-thought on hybrid models such as Qwen 3/3.5
+  via Ollama, so translations no longer stall on a reasoning trace.
+
 ## [0.2.1] - 2026-06-15
 
 ### Fixed
