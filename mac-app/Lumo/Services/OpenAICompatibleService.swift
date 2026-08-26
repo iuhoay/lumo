@@ -54,7 +54,7 @@ func openAICompatibleRequestBody(_ request: ChatRequest) -> [String: Any] {
         "model": request.model,
         "messages": [
             ["role": "system", "content": request.system],
-            ["role": "user", "content": request.thinking.appliedUserContent(request.user)]
+            ["role": "user", "content": request.user]
         ],
         "temperature": 0.2,
         "stream": true

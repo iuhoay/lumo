@@ -17,15 +17,4 @@ enum ThinkingMode: String, CaseIterable, Identifiable {
         case .on: return String(localized: "On")
         }
     }
-
-    /// Qwen chat-template switch. Only applied when Off so other models don't
-    /// see a stray `/no_think` token.
-    func appliedUserContent(_ user: String) -> String {
-        switch self {
-        case .off:
-            return user + "\n\n/no_think"
-        case .on:
-            return user
-        }
-    }
 }

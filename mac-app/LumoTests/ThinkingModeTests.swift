@@ -8,12 +8,6 @@ struct ThinkingModeTests {
     func cases() {
         #expect(ThinkingMode.allCases == [.off, .on])
     }
-
-    @Test("off appends /no_think; on leaves the user text alone")
-    func appliedUserContent() {
-        #expect(ThinkingMode.off.appliedUserContent("Hello") == "Hello\n\n/no_think")
-        #expect(ThinkingMode.on.appliedUserContent("Hello") == "Hello")
-    }
 }
 
 @Suite("Provider.supportsThinkingControl")
@@ -45,12 +39,12 @@ struct OpenAICompatibleRequestBodyTests {
         return messages?.last?["content"]
     }
 
-    @Test("off sends reasoning_effort none, think false, and /no_think")
+    @Test("off sends reasoning_effort none and think false, without rewriting the user message")
     func offDisables() {
         let body = openAICompatibleRequestBody(request(thinking: .off))
         #expect(body["reasoning_effort"] as? String == "none")
         #expect(body["think"] as? Bool == false)
-        #expect(userContent(body) == "Hello\n\n/no_think")
+        #expect(userContent(body) == "Hello")
     }
 
     @Test("on omits thinking fields and leaves the user message alone")

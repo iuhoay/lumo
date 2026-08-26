@@ -274,7 +274,7 @@ struct StreamParsingTests {
         #expect(json["reasoning_effort"] as? String == "none")
         #expect(json["think"] as? Bool == false)
         let messages = try #require(json["messages"] as? [[String: String]])
-        #expect(messages.last?["content"] == "Hello\n\n/no_think")
+        #expect(messages.last?["content"] == "Hello")
     }
 
     // MARK: - Anthropic
