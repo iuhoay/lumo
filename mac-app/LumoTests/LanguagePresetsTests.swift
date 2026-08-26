@@ -1,3 +1,4 @@
+import NaturalLanguage
 import Testing
 @testable import Lumo
 
@@ -60,5 +61,25 @@ struct LanguagePresetsCanonicalTests {
     @Test("The custom tag never collides with a preset name")
     func customTagCollision() {
         #expect(LanguagePresets.list.contains(LanguagePresets.customTag) == false)
+    }
+}
+
+// MARK: - LanguagePresets.nlLanguage(named:)
+
+@Suite("LanguagePresets.nlLanguage")
+struct LanguagePresetsNLLanguageTests {
+    @Test("Preset names map to NLLanguage", arguments: [
+        ("English", NLLanguage.english),
+        ("simplified chinese", NLLanguage.simplifiedChinese),
+        ("Japanese", NLLanguage.japanese),
+    ] as [(String, NLLanguage)])
+    func mapsPreset(name: String, language: NLLanguage) {
+        #expect(LanguagePresets.nlLanguage(named: name) == language)
+    }
+
+    @Test("Custom text is not a preset language")
+    func customIsNil() {
+        #expect(LanguagePresets.nlLanguage(named: "Dutch") == nil)
+        #expect(LanguagePresets.nlLanguage(named: "en") == nil)
     }
 }

@@ -94,8 +94,8 @@ struct TranslationView: View {
             Divider()
 
             HStack(spacing: 4) {
-                if !model.resolvedTarget.isEmpty, model.mode != .polish {
-                    DestinationPicker(destination: model.resolvedTarget) {
+                if !model.destination.isEmpty, model.mode != .polish {
+                    DestinationPicker(destination: model.destination) {
                         model.setDestination($0)
                     }
                 }

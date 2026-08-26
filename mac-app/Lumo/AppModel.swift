@@ -14,10 +14,10 @@ final class AppModel: ObservableObject {
     /// Currently selected action (translate / polish / summarize).
     @Published var mode: TranslationMode = .translate
     @Published var output: String = ""
-    @Published var resolvedTarget: String = ""
-    /// When true, `resolvedTarget` is a per-window override and `translate()`
-    /// must not replace it with a freshly detected destination.
-    private var destinationOverridden = false
+    /// Last resolved destination shown in the window and sent to the prompt.
+    @Published var destination: String = ""
+    /// Per-window override. `nil` means detect (or prefill `defaultTarget`).
+    private var destinationOverride: String?
     @Published var isLoading: Bool = false
     @Published var isCapturingScreenText: Bool = false
     @Published var errorText: String?
@@ -51,7 +51,7 @@ final class AppModel: ObservableObject {
         windowController.present()
         // Put focus in the editable input (so it's ready to tweak/re-translate)
         // rather than letting a toolbar button take keyboard focus + focus ring.
-        destinationOverridden = false
+        destinationOverride = nil
         focusInputToken &+= 1
         translate()
     }
@@ -64,8 +64,8 @@ final class AppModel: ObservableObject {
         output = ""
         errorText = nil
         errorSettingsDestination = nil
-        destinationOverridden = false
-        resolvedTarget = AppSettings.shared.targetLanguage
+        destinationOverride = nil
+        destination = AppSettings.shared.defaultTarget
         isLoading = false
         windowController.present()
         focusInputToken &+= 1
@@ -113,8 +113,8 @@ final class AppModel: ObservableObject {
             output = ""
             errorText = nil
             errorSettingsDestination = nil
-            if !destinationOverridden {
-                resolvedTarget = AppSettings.shared.targetLanguage
+            if destinationOverride == nil {
+                destination = AppSettings.shared.defaultTarget
             }
             isLoading = false
             return
@@ -128,11 +128,11 @@ final class AppModel: ObservableObject {
         let mode = self.mode
         let target = LanguageDetector.resolvedDestination(
             text: text,
-            target: settings.targetLanguage,
-            fallback: settings.nativeLanguage,
-            override: destinationOverridden ? resolvedTarget : nil
+            target: settings.defaultTarget,
+            fallback: settings.fallbackLanguage,
+            override: destinationOverride
         )
-        resolvedTarget = target
+        destination = target
         // The on-device provider has no configurable model name; label it so
         // history doesn't show an unrelated, unused cloud model string.
         let modelName = settings.provider.isOnDevice ? "Apple On-Device" : settings.model
@@ -180,9 +180,7 @@ final class AppModel: ObservableObject {
     func setMode(_ newMode: TranslationMode) {
         guard mode != newMode else { return }
         mode = newMode
-        if isLoading || !output.isEmpty || errorText != nil {
-            translate()
-        }
+        if hasActiveTranslation { translate() }
     }
 
     /// Override the destination for this window. Re-run only when a translation
@@ -191,12 +189,14 @@ final class AppModel: ObservableObject {
     func setDestination(_ newDestination: String) {
         let trimmed = newDestination.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
-        let changed = trimmed != resolvedTarget
-        resolvedTarget = trimmed
-        destinationOverridden = true
-        if changed && (isLoading || !output.isEmpty || errorText != nil) {
-            translate()
-        }
+        let changed = trimmed != destination
+        destination = trimmed
+        destinationOverride = trimmed
+        if changed && hasActiveTranslation { translate() }
+    }
+
+    private var hasActiveTranslation: Bool {
+        isLoading || !output.isEmpty || errorText != nil
     }
 
     private func handleOCRSelection(_ result: OCRSelectionResult) async {
@@ -226,8 +226,8 @@ final class AppModel: ObservableObject {
         task?.cancel()
         inputText = ""
         output = ""
-        destinationOverridden = false
-        resolvedTarget = ""
+        destinationOverride = nil
+        destination = ""
         isLoading = false
         errorText = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         if let error = error as? ScreenCaptureServiceError, error == .screenRecordingPermissionDenied {

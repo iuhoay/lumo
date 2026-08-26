@@ -31,15 +31,16 @@ final class AppSettings: ObservableObject {
     @Published var thinking: ThinkingMode {
         didSet { defaults.set(thinking.rawValue, forKey: Keys.thinking) }
     }
-    /// Flip-back language: used only when the input is already in `targetLanguage`.
+    /// Flip-back language: used only when the input is already in `defaultTarget`.
     /// Storage key stays `nativeLanguage` so existing installs don't remigrate.
-    @Published var nativeLanguage: String {
-        didSet { defaults.set(nativeLanguage, forKey: Keys.nativeLanguage) }
+    @Published var fallbackLanguage: String {
+        didSet { defaults.set(fallbackLanguage, forKey: Keys.nativeLanguage) }
     }
     /// Default destination. Any language that isn't already this one translates
     /// here; the translation window can override it for one request.
-    @Published var targetLanguage: String {
-        didSet { defaults.set(targetLanguage, forKey: Keys.targetLanguage) }
+    /// Storage key stays `targetLanguage`.
+    @Published var defaultTarget: String {
+        didSet { defaults.set(defaultTarget, forKey: Keys.targetLanguage) }
     }
 
     private init() {
@@ -54,8 +55,8 @@ final class AppSettings: ObservableObject {
         // migrated values explicitly, then retire the legacy keys.
         let legacyTarget = defaults.string(forKey: LegacyKeys.targetWhenChinese)
         let legacyNative = defaults.string(forKey: LegacyKeys.targetWhenOther)
-        nativeLanguage = defaults.string(forKey: Keys.nativeLanguage) ?? legacyNative ?? "Simplified Chinese"
-        targetLanguage = defaults.string(forKey: Keys.targetLanguage) ?? legacyTarget ?? "English"
+        fallbackLanguage = defaults.string(forKey: Keys.nativeLanguage) ?? legacyNative ?? "Simplified Chinese"
+        defaultTarget = defaults.string(forKey: Keys.targetLanguage) ?? legacyTarget ?? "English"
         // Resolve the current provider's base URL, migrating any pre-existing
         // single global value (legacy Keys.baseURL) into the current provider.
         let perProvider = defaults.string(forKey: "baseURL.\(provider.rawValue)") ?? ""
@@ -72,11 +73,11 @@ final class AppSettings: ObservableObject {
             defaults.set(baseURL, forKey: "baseURL.\(provider.rawValue)")
             defaults.removeObject(forKey: Keys.baseURL)
         }
-        // Persist the migrated language values (reads of nativeLanguage/
-        // targetLanguage are only legal after every stored property is set,
+        // Persist the migrated language values (reads of fallbackLanguage/
+        // defaultTarget are only legal after every stored property is set,
         // hence after baseURL above), then retire the legacy keys.
-        defaults.set(nativeLanguage, forKey: Keys.nativeLanguage)
-        defaults.set(targetLanguage, forKey: Keys.targetLanguage)
+        defaults.set(fallbackLanguage, forKey: Keys.nativeLanguage)
+        defaults.set(defaultTarget, forKey: Keys.targetLanguage)
         if legacyTarget != nil || legacyNative != nil {
             defaults.removeObject(forKey: LegacyKeys.targetWhenChinese)
             defaults.removeObject(forKey: LegacyKeys.targetWhenOther)

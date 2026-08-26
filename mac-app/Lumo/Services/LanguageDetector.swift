@@ -24,35 +24,22 @@ enum LanguageDetector {
         "th", "tr", "uk", "ur", "vi", "zh-hans", "zh-hant",
     ]
 
-    /// Maps a stored language name — a `LanguagePresets` preset ("Simplified
-    /// Chinese", "English", …) or a raw `NLLanguage` code ("en", "zh-Hans",
-    /// "ja") typed into the custom field — to `NLLanguage`. Nil when the name
-    /// is unmappable.
+    /// Maps a stored language name — a `LanguagePresets` preset or a raw
+    /// `NLLanguage` code ("en", "zh-Hans", "ja") typed into the custom field
+    /// — to `NLLanguage`. Nil when the name is unmappable.
     static func languageCode(for name: String) -> NLLanguage? {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        switch trimmed {
-        case "English": return .english
-        case "Simplified Chinese": return .simplifiedChinese
-        case "Traditional Chinese": return .traditionalChinese
-        case "Japanese": return .japanese
-        case "Korean": return .korean
-        case "French": return .french
-        case "German": return .german
-        case "Spanish": return .spanish
-        case "Portuguese": return .portuguese
-        case "Italian": return .italian
-        case "Russian": return .russian
-        case "Arabic": return .arabic
-        default:
-            // Accept raw NLLanguage codes as typed in the custom field.
-            // NLLanguage(rawValue:) never fails, so gate it on the whitelist;
-            // restore the canonical case for the two codes that have one.
-            switch trimmed.lowercased() {
-            case "zh-hans": return .simplifiedChinese
-            case "zh-hant": return .traditionalChinese
-            case let code where validCodes.contains(code): return NLLanguage(rawValue: code)
-            default: return nil
-            }
+        if let language = LanguagePresets.nlLanguage(named: trimmed) {
+            return language
+        }
+        // Accept raw NLLanguage codes as typed in the custom field.
+        // NLLanguage(rawValue:) never fails, so gate it on the whitelist;
+        // restore the canonical case for the two codes that have one.
+        switch trimmed.lowercased() {
+        case "zh-hans": return .simplifiedChinese
+        case "zh-hant": return .traditionalChinese
+        case let code where validCodes.contains(code): return NLLanguage(rawValue: code)
+        default: return nil
         }
     }
 

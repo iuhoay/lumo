@@ -48,8 +48,8 @@ struct SettingsView: View {
             }
 
                 Section {
-                LanguageField(title: "Default target", value: $settings.targetLanguage)
-                LanguageField(title: "Flip-back language", value: $settings.nativeLanguage)
+                LanguageField(title: "Default target", value: $settings.defaultTarget)
+                LanguageField(title: "Flip-back language", value: $settings.fallbackLanguage)
             } header: {
                 Text("Language (translate mode)")
             } footer: {
