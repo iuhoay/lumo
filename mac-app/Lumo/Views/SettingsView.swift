@@ -34,6 +34,15 @@ struct SettingsView: View {
                               prompt: Text(settings.provider.defaultBaseURL))
                     TextField("Model", text: $settings.model,
                               prompt: Text("deepseek-v4-flash"))
+
+                    if settings.provider.supportsThinkingControl {
+                        Picker("Thinking", selection: $settings.thinking) {
+                            ForEach(ThinkingMode.allCases) { mode in
+                                Text(mode.title).tag(mode)
+                            }
+                        }
+                        .help(String(localized: "Off disables thinking for Qwen and Ollama hybrid models. Ignored by models that don't support it."))
+                    }
                 }
             }
 
@@ -52,7 +61,7 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 460, height: 360)
+        .frame(width: 460, height: 400)
         .onAppear {
             apiKey = settings.apiKey(for: settings.provider)
         }

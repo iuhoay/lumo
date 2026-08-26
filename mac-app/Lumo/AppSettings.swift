@@ -25,6 +25,12 @@ final class AppSettings: ObservableObject {
     @Published var model: String {
         didSet { defaults.set(model, forKey: Keys.model) }
     }
+
+    /// Thinking / chain-of-thought for OpenAI-compatible hosts (Ollama, Qwen).
+    /// Off disables it; On omits the wire fields so the host keeps its default.
+    @Published var thinking: ThinkingMode {
+        didSet { defaults.set(thinking.rawValue, forKey: Keys.thinking) }
+    }
     /// Target language when the input IS Chinese.
     @Published var targetWhenChinese: String {
         didSet { defaults.set(targetWhenChinese, forKey: Keys.targetWhenChinese) }
@@ -38,6 +44,7 @@ final class AppSettings: ObservableObject {
         let provider = Provider(rawValue: defaults.string(forKey: Keys.provider) ?? "") ?? .openAICompatible
         self.provider = provider
         model = defaults.string(forKey: Keys.model) ?? "deepseek-v4-flash"
+        thinking = ThinkingMode(rawValue: defaults.string(forKey: Keys.thinking) ?? "") ?? .off
         targetWhenChinese = defaults.string(forKey: Keys.targetWhenChinese) ?? "English"
         targetWhenOther = defaults.string(forKey: Keys.targetWhenOther) ?? "Simplified Chinese"
         // Resolve the current provider's base URL, migrating any pre-existing
@@ -87,6 +94,7 @@ final class AppSettings: ObservableObject {
         static let provider = "provider"
         static let baseURL = "baseURL"
         static let model = "model"
+        static let thinking = "thinking"
         static let targetWhenChinese = "targetWhenChinese"
         static let targetWhenOther = "targetWhenOther"
     }

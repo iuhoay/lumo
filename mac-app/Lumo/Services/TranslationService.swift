@@ -7,6 +7,7 @@ struct ChatRequest {
     var model: String
     var system: String
     var user: String
+    var thinking: ThinkingMode = .off
 }
 
 enum TranslationError: LocalizedError {

@@ -16,20 +16,13 @@ struct OpenAICompatibleService: TranslationService {
                     urlRequest.httpMethod = "POST"
                     urlRequest.setValue("Bearer \(request.apiKey)", forHTTPHeaderField: "Authorization")
                     urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-                    let body: [String: Any] = [
-                        "model": request.model,
-                        "messages": [
-                            ["role": "system", "content": request.system],
-                            ["role": "user", "content": request.user],
-                        ],
-                        "temperature": 0.2,
-                        "stream": true,
-                    ]
-                    urlRequest.httpBody = try JSONSerialization.data(withJSONObject: body)
+                    urlRequest.httpBody = try JSONSerialization.data(
+                        withJSONObject: openAICompatibleRequestBody(request)
+                    )
 
                     let (bytes, response) = try await URLSession.shared.bytes(for: urlRequest)
                     guard let http = response as? HTTPURLResponse else { throw TranslationError.invalidResponse }
-                    guard (200..<300).contains(http.statusCode) else {
+                    guard (200 ..< 300).contains(http.statusCode) else {
                         throw TranslationError.http(status: http.statusCode, body: await collectBody(bytes))
                     }
 
@@ -39,7 +32,8 @@ struct OpenAICompatibleService: TranslationService {
                         if payload == "[DONE]" { break }
                         if let data = payload.data(using: .utf8),
                            let chunk = try? JSONDecoder().decode(StreamChunk.self, from: data),
-                           let delta = chunk.choices.first?.delta.content, !delta.isEmpty {
+                           let delta = chunk.choices.first?.delta.content, !delta.isEmpty
+                        {
                             continuation.yield(delta)
                         }
                     }
@@ -53,10 +47,30 @@ struct OpenAICompatibleService: TranslationService {
     }
 }
 
+/// JSON body for `/v1/chat/completions`. Off disables thinking; On omits the
+/// fields so the host keeps its default (Ollama: on for Qwen 3/3.5).
+func openAICompatibleRequestBody(_ request: ChatRequest) -> [String: Any] {
+    var body: [String: Any] = [
+        "model": request.model,
+        "messages": [
+            ["role": "system", "content": request.system],
+            ["role": "user", "content": request.user]
+        ],
+        "temperature": 0.2,
+        "stream": true
+    ]
+    if request.thinking == .off {
+        body["reasoning_effort"] = "none"
+        body["think"] = false
+    }
+    return body
+}
+
 private struct StreamChunk: Decodable {
     struct Choice: Decodable {
         struct Delta: Decodable { let content: String? }
         let delta: Delta
     }
+
     let choices: [Choice]
 }

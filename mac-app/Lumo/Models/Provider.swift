@@ -32,4 +32,14 @@ enum Provider: String, CaseIterable, Identifiable {
     /// Apple's on-device model needs no API key, base URL, or model name — the
     /// Settings UI hides those fields and the request fields go unused.
     var isOnDevice: Bool { self == .appleFoundation }
+
+    /// OpenAI and OpenAI-compatible share `/v1/chat/completions`, which is
+    /// where thinking is controlled (`reasoning_effort` / `think`). Anthropic
+    /// and the on-device model have different (or no) knobs.
+    var supportsThinkingControl: Bool {
+        switch self {
+        case .openAI, .openAICompatible: return true
+        case .anthropic, .appleFoundation: return false
+        }
+    }
 }

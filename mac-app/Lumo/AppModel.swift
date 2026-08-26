@@ -133,7 +133,8 @@ final class AppModel: ObservableObject {
             apiKey: settings.apiKey(for: settings.provider),
             model: modelName,
             system: mode.systemPrompt(target: target),
-            user: text
+            user: text,
+            thinking: settings.provider.supportsThinkingControl ? settings.thinking : .on
         )
         let service = ServiceFactory.make(for: settings.provider)
 
