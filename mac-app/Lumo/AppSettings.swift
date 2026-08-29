@@ -31,13 +31,16 @@ final class AppSettings: ObservableObject {
     @Published var thinking: ThinkingMode {
         didSet { defaults.set(thinking.rawValue, forKey: Keys.thinking) }
     }
-    /// Target language when the input IS Chinese.
-    @Published var targetWhenChinese: String {
-        didSet { defaults.set(targetWhenChinese, forKey: Keys.targetWhenChinese) }
+    /// Flip-back language: used only when the input is already in `defaultTarget`.
+    /// Storage key stays `nativeLanguage` so existing installs don't remigrate.
+    @Published var fallbackLanguage: String {
+        didSet { defaults.set(fallbackLanguage, forKey: Keys.nativeLanguage) }
     }
-    /// Target language when the input is NOT Chinese.
-    @Published var targetWhenOther: String {
-        didSet { defaults.set(targetWhenOther, forKey: Keys.targetWhenOther) }
+    /// Default destination. Any language that isn't already this one translates
+    /// here; the translation window can override it for one request.
+    /// Storage key stays `targetLanguage`.
+    @Published var defaultTarget: String {
+        didSet { defaults.set(defaultTarget, forKey: Keys.targetLanguage) }
     }
 
     private init() {
@@ -45,8 +48,15 @@ final class AppSettings: ObservableObject {
         self.provider = provider
         model = defaults.string(forKey: Keys.model) ?? "deepseek-v4-flash"
         thinking = ThinkingMode(rawValue: defaults.string(forKey: Keys.thinking) ?? "") ?? .off
-        targetWhenChinese = defaults.string(forKey: Keys.targetWhenChinese) ?? "English"
-        targetWhenOther = defaults.string(forKey: Keys.targetWhenOther) ?? "Simplified Chinese"
+        // Migrate the legacy two-way model (target per Chinese/non-Chinese
+        // input) to native/target: the old "when input IS Chinese →" value is
+        // the target language, the old "when input is NOT Chinese →" value is
+        // the native language. didSet does NOT fire in init, so persist the
+        // migrated values explicitly, then retire the legacy keys.
+        let legacyTarget = defaults.string(forKey: LegacyKeys.targetWhenChinese)
+        let legacyNative = defaults.string(forKey: LegacyKeys.targetWhenOther)
+        fallbackLanguage = defaults.string(forKey: Keys.nativeLanguage) ?? legacyNative ?? "Simplified Chinese"
+        defaultTarget = defaults.string(forKey: Keys.targetLanguage) ?? legacyTarget ?? "English"
         // Resolve the current provider's base URL, migrating any pre-existing
         // single global value (legacy Keys.baseURL) into the current provider.
         let perProvider = defaults.string(forKey: "baseURL.\(provider.rawValue)") ?? ""
@@ -62,6 +72,15 @@ final class AppSettings: ObservableObject {
         if perProvider.isEmpty && !legacy.isEmpty {
             defaults.set(baseURL, forKey: "baseURL.\(provider.rawValue)")
             defaults.removeObject(forKey: Keys.baseURL)
+        }
+        // Persist the migrated language values (reads of fallbackLanguage/
+        // defaultTarget are only legal after every stored property is set,
+        // hence after baseURL above), then retire the legacy keys.
+        defaults.set(fallbackLanguage, forKey: Keys.nativeLanguage)
+        defaults.set(defaultTarget, forKey: Keys.targetLanguage)
+        if legacyTarget != nil || legacyNative != nil {
+            defaults.removeObject(forKey: LegacyKeys.targetWhenChinese)
+            defaults.removeObject(forKey: LegacyKeys.targetWhenOther)
         }
     }
 
@@ -95,6 +114,12 @@ final class AppSettings: ObservableObject {
         static let baseURL = "baseURL"
         static let model = "model"
         static let thinking = "thinking"
+        static let nativeLanguage = "nativeLanguage"
+        static let targetLanguage = "targetLanguage"
+    }
+
+    /// Pre-rename storage keys, read once for migration in init.
+    private enum LegacyKeys {
         static let targetWhenChinese = "targetWhenChinese"
         static let targetWhenOther = "targetWhenOther"
     }

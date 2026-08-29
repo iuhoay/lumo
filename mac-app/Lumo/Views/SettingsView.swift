@@ -7,8 +7,9 @@ struct SettingsView: View {
     @State private var savedNote: Bool = false
 
     var body: some View {
-        Form {
-            Section("Provider") {
+        ScrollView {
+            Form {
+                Section("Provider") {
                 Picker("Provider", selection: $settings.provider) {
                     ForEach(Provider.allCases) { provider in
                         Text(provider.title).tag(provider)
@@ -46,12 +47,16 @@ struct SettingsView: View {
                 }
             }
 
-            Section("Language (translate mode)") {
-                TextField("Chinese input → translate to", text: $settings.targetWhenChinese)
-                TextField("Non-Chinese input → translate to", text: $settings.targetWhenOther)
+                Section {
+                LanguageField(title: "Default target", value: $settings.defaultTarget)
+                LanguageField(title: "Flip-back language", value: $settings.fallbackLanguage)
+            } header: {
+                Text("Language (translate mode)")
+            } footer: {
+                Text("Any language translates to the default target. Input already in the default target flips to the flip-back language. The translation window can change the destination for one request without changing these defaults.")
             }
 
-            Section("Shortcuts") {
+                Section("Shortcuts") {
                 // Recording here updates the global hotkey live (AppDelegate
                 // registered the handler at launch against the same name).
                 // Recorder's title is a plain String, so localize it explicitly
@@ -59,9 +64,13 @@ struct SettingsView: View {
                 KeyboardShortcuts.Recorder(String(localized: "New Translation…"), name: .newTranslation)
                 KeyboardShortcuts.Recorder(String(localized: "OCR Screen Text…"), name: .ocrScreenText)
             }
+            }
+            .formStyle(.grouped)
+            .frame(width: 460)
         }
-        .formStyle(.grouped)
-        .frame(width: 460, height: 400)
+        // Scrollable so the window stays usable when the on-device status row
+        // or an open "Custom…" language field pushes the form past the frame.
+        .frame(width: 460, height: 420)
         .onAppear {
             apiKey = settings.apiKey(for: settings.provider)
         }

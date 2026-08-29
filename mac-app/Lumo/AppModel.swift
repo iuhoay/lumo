@@ -14,7 +14,10 @@ final class AppModel: ObservableObject {
     /// Currently selected action (translate / polish / summarize).
     @Published var mode: TranslationMode = .translate
     @Published var output: String = ""
-    @Published var resolvedTarget: String = ""
+    /// Last resolved destination shown in the window and sent to the prompt.
+    @Published var destination: String = ""
+    /// Per-window override. `nil` means detect (or prefill `defaultTarget`).
+    private var destinationOverride: String?
     @Published var isLoading: Bool = false
     @Published var isCapturingScreenText: Bool = false
     @Published var errorText: String?
@@ -48,6 +51,7 @@ final class AppModel: ObservableObject {
         windowController.present()
         // Put focus in the editable input (so it's ready to tweak/re-translate)
         // rather than letting a toolbar button take keyboard focus + focus ring.
+        destinationOverride = nil
         focusInputToken &+= 1
         translate()
     }
@@ -60,7 +64,8 @@ final class AppModel: ObservableObject {
         output = ""
         errorText = nil
         errorSettingsDestination = nil
-        resolvedTarget = ""
+        destinationOverride = nil
+        destination = AppSettings.shared.defaultTarget
         isLoading = false
         windowController.present()
         focusInputToken &+= 1
@@ -108,7 +113,9 @@ final class AppModel: ObservableObject {
             output = ""
             errorText = nil
             errorSettingsDestination = nil
-            resolvedTarget = ""
+            if destinationOverride == nil {
+                destination = AppSettings.shared.defaultTarget
+            }
             isLoading = false
             return
         }
@@ -119,12 +126,13 @@ final class AppModel: ObservableObject {
 
         let settings = AppSettings.shared
         let mode = self.mode
-        let target = LanguageDetector.target(
-            for: text,
-            whenChinese: settings.targetWhenChinese,
-            otherwise: settings.targetWhenOther
+        let target = LanguageDetector.resolvedDestination(
+            text: text,
+            target: settings.defaultTarget,
+            fallback: settings.fallbackLanguage,
+            override: destinationOverride
         )
-        resolvedTarget = target
+        destination = target
         // The on-device provider has no configurable model name; label it so
         // history doesn't show an unrelated, unused cloud model string.
         let modelName = settings.provider.isOnDevice ? "Apple On-Device" : settings.model
@@ -172,9 +180,23 @@ final class AppModel: ObservableObject {
     func setMode(_ newMode: TranslationMode) {
         guard mode != newMode else { return }
         mode = newMode
-        if isLoading || !output.isEmpty || errorText != nil {
-            translate()
-        }
+        if hasActiveTranslation { translate() }
+    }
+
+    /// Override the destination for this window. Re-run only when a translation
+    /// is already on screen (a result or an error) or in flight — same gate as
+    /// `setMode`. Does not write back to Settings.
+    func setDestination(_ newDestination: String) {
+        let trimmed = newDestination.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        let changed = trimmed != destination
+        destination = trimmed
+        destinationOverride = trimmed
+        if changed && hasActiveTranslation { translate() }
+    }
+
+    private var hasActiveTranslation: Bool {
+        isLoading || !output.isEmpty || errorText != nil
     }
 
     private func handleOCRSelection(_ result: OCRSelectionResult) async {
@@ -204,7 +226,8 @@ final class AppModel: ObservableObject {
         task?.cancel()
         inputText = ""
         output = ""
-        resolvedTarget = ""
+        destinationOverride = nil
+        destination = ""
         isLoading = false
         errorText = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         if let error = error as? ScreenCaptureServiceError, error == .screenRecordingPermissionDenied {
