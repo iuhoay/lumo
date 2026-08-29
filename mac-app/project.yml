@@ -20,7 +20,7 @@ packages:
 
 settings:
   base:
-    MARKETING_VERSION: "0.2.2"
+    MARKETING_VERSION: "0.2.3"
     CURRENT_PROJECT_VERSION: "1"
     SWIFT_VERSION: "5.0"
     # Ad-hoc signed (identity "-"), no Developer ID / notarization. Signing is
@@ -71,7 +71,7 @@ targets:
         # Build settings below are substituted by Xcode at "Process Info.plist".
         CFBundleDisplayName: $(APP_DISPLAY_NAME)
         CFBundleName: $(PRODUCT_NAME)
-        CFBundleShortVersionString: "0.2.2"
+        CFBundleShortVersionString: "0.2.3"
         # Localizations the app ships. The UI is authored in English (base) and
         # translated via Lumo/Localizable.xcstrings; the system picks the user's
         # preferred match at runtime (falls back to English).
