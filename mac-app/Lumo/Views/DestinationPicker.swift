@@ -46,10 +46,16 @@ struct DestinationPicker: View {
                     .foregroundStyle(.secondary)
                 TextField("e.g. Dutch", text: $customText)
                     .textFieldStyle(.roundedBorder)
-                    .onSubmit { commitCustom() }
+                    .onSubmit {
+                        commitCustom()
+                        showingCustom = false
+                    }
             }
             .padding(12)
             .frame(width: 220)
+        }
+        .onChange(of: showingCustom) { _, isShowing in
+            if !isShowing { commitCustom() }
         }
     }
 
@@ -57,7 +63,6 @@ struct DestinationPicker: View {
         let trimmed = customText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
         onSelect(LanguagePresets.canonicalPreset(matching: trimmed) ?? trimmed)
-        showingCustom = false
     }
 }
 

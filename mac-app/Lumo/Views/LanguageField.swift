@@ -31,6 +31,11 @@ struct LanguageField: View {
         .onChange(of: selection) { _, newValue in
             if newValue != LanguagePresets.customTag {
                 value = newValue
+            } else {
+                let trimmed = customText.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !trimmed.isEmpty {
+                    value = customText
+                }
             }
         }
 
@@ -43,7 +48,7 @@ struct LanguageField: View {
                         selection = preset
                         customText = ""
                         value = preset
-                    } else {
+                    } else if !newText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         value = newText
                     }
                 }
