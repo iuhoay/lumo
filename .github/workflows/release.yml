@@ -2,7 +2,9 @@ name: Release
 
 on:
   push:
-    tags: ["v*"]
+    # Three components only (v0.2.4). Two-component tags (v1.0) are
+    # PopClip directory submissions; see popclip-directory.yaml.
+    tags: ["v*.*.*"]
 
 permissions:
   contents: write

@@ -1,3 +1,3 @@
-# popclip-1.0, popclip-1.1, … — not v*, which is the Lumo release workflow.
+# Directory tags are v1.0, v1.1, … App releases stay vX.Y.Z.
 include: "Lumo.popclipext"
-versionPrefix: popclip-
+versionPrefix: v
