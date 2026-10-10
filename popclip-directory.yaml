@@ -1,0 +1,3 @@
+# popclip-1.0, popclip-1.1, … — not v*, which is the Lumo release workflow.
+include: "Lumo.popclipext"
+versionPrefix: popclip-

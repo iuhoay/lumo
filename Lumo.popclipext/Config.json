@@ -5,6 +5,15 @@
     "en": "Hand selected text to Lumo.app to translate, polish, or summarize. Provider, API key, model, and language are all configured in the app's settings.",
     "zh-Hans": "把选中文字交给 Lumo.app 处理（翻译 / 润色 / 总结）。Provider、API Key、模型、语言都在 app 的设置里配置。"
   },
+  "keywords": "translate polish summarize translation llm 翻译 润色 总结 翻訳 要約 번역 요약",
+  "popclipVersion": 4578,
+  "macosVersion": "26.0",
+  "app": {
+    "name": "Lumo",
+    "link": "https://iuhoay.dev/lumo/",
+    "checkInstalled": true,
+    "bundleIdentifiers": ["com.iuhoay.lumo", "com.iuhoay.lumo.dev"]
+  },
   "icon": "symbol:character.bubble",
   "module": "translate.js",
   "options": [
