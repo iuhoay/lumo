@@ -131,7 +131,10 @@ final class TranslationWindowController {
         window.isOpaque = false
         window.backgroundColor = .clear
         window.hasShadow = true
-        window.isMovableByWindowBackground = true
+        // macOS 27 no longer starts a background drag through an NSHostingView.
+        // TranslationView's WindowDragGesture owns moving; leaving this on
+        // double-moves the window where the old path still fires.
+        window.isMovableByWindowBackground = false
         window.isReleasedWhenClosed = false
         // Keep in sync with TranslationView's frame minWidth: a narrower window
         // clips the header toolbar's trailing buttons under the rounded mask.

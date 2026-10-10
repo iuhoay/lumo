@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The translation window can be dragged again on macOS 27. Blank glass, labels,
+  and dividers move it; text, scrolling, and buttons still take the click.
+
 ## [0.2.3] - 2026-08-29
 
 ### Added

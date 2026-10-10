@@ -46,6 +46,12 @@ struct TranslationView: View {
             // Liquid Glass: the whole popup is a single floating glass slab over the
             // desktop. Controls inside stay flat (borderless) to avoid glass-on-glass.
             .glassEffect(in: RoundedRectangle(cornerRadius: GlassPanelMetrics.cornerRadius, style: .continuous))
+            // Borderless: the slab is the drag surface. contentShape makes the
+            // empty glass hittable; `.gesture` loses to text selection, scrolling,
+            // and controls, so only non-input areas move the window.
+            .contentShape(RoundedRectangle(cornerRadius: GlassPanelMetrics.cornerRadius, style: .continuous))
+            .gesture(WindowDragGesture())
+            .allowsWindowActivationEvents()
             // Command-key shortcuts that the visible controls can't carry: ⌘1/⌘2/⌘3
             // (the segmented Picker has no per-segment shortcut hook) and ⌘R (kept
             // chromeless by choice). Hidden buttons stay in the hierarchy, so the
